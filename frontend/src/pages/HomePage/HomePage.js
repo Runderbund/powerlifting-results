@@ -1,8 +1,8 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import useAuth from "../../hooks/useAuth";
+// import { useEffect, useState } from "react";
+// import useAuth from "../../hooks/useAuth";
 
-import axios from "axios";
+// import axios from "axios";
 
 const HomePage = () => {
   return (
