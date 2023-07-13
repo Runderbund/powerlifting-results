@@ -11,10 +11,33 @@ const Navbar = () => {
     <div className={styles.navBar}>
       <ul>
         <li className={styles.brand}>
-          <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+          <Link to="/">
             <b>Home</b>
           </Link>
         </li>
+        <li className={styles.brand}>
+          <Link to="/">
+            <b>Lifters</b>
+          </Link>
+        </li>
+        <li className={styles.brand}>
+          <Link to="/">
+            <b>Meet Results</b>
+          </Link>
+        </li>
+        <li className={styles.brand}>
+          <Link to="/">
+            <b>Unit Converter</b>
+          </Link>
+        </li>
+        {user && (
+          <li className={styles.brand}>
+            <Link to="/upload">
+              <b>Upload</b>
+            </Link>
+          </li>
+        )}
+
         <li>
           {user ? (
             <button onClick={logoutUser}>Logout</button>

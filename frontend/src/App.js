@@ -7,17 +7,16 @@ import HomePage from "./pages/HomePage/HomePage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import LifterListPage from "./pages/LifterListPage/LifterListPage";
-import LifterPage from "./pages/LifterListPage/LifterPage";
+import LifterPage from "./pages/LifterPage/LifterPage";
 import MeetResultsPage from "./pages/MeetResultsPage/MeetResultsPage";
 import ResultsUploadPage from "./pages/ResultsUploadPage/ResultsUploadPage";
 import UnitConversionPage from "./pages/UnitConversionPage/UnitConversionPage";
-
 
 // Component Imports
 import Navbar from "./components/NavBar/NavBar";
 
 // Util Imports
-// import PrivateRoute from "./utils/PrivateRoute";
+import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   return (
@@ -30,9 +29,15 @@ function App() {
         <Route path="/lifterlist" element={<LifterListPage />} />
         <Route path="/lifter" element={<LifterPage />} />
         <Route path="/meetresults" element={<MeetResultsPage />} />
-        <Route path="/upload" element={<ResultsUploadPage />} />
         <Route path="/unitconversion" element={<UnitConversionPage />} />
-
+        <Route
+          path="/upload"
+          element={
+            <PrivateRoute>
+              <ResultsUploadPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );

@@ -29,7 +29,7 @@ li {
   cursor: pointer;
 }
 
-.brand {
+.brand a {
   cursor: pointer;
   font-size: 1rem;
   text-decoration: none;
