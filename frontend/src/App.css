@@ -17,6 +17,14 @@ p {
   font-size: 20px;
 }
 
+/* Doesn't have from styling video, because different setup.*/
+/* May adjust and use. */
+/* 
+main{
+  margin:0 auto;
+  min-height: 100vh;
+} */
+
 button {
   background-color: transparent;
   border: 2px solid steelblue;
