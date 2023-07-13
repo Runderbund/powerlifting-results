@@ -1,14 +1,16 @@
+/* Maybe a good idea to have global css along with modular. Set up basics, and then modify for each page.
+For now, just disconnecting from App.css and going all modular.
+Will lead to needless repetition, but clearer logic for me until the important stuff is done. */
+
 .container {
     margin: 0 auto;
     overflow: auto;
     text-align: center;
     min-height: 100vh;
     background-color: burlywood;
-    /* Being decided by App.css? Need to get rid of that. */
   }
 
   .logo {
-    max-width: 300px;
-    /* ...other styles... */
+    max-width: 500px;
   }
   
