@@ -2,7 +2,7 @@ import React from "react";
 import { useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
-import styles from "./NavBar.module.css"; // Import styles
+import styles from "./NavBar.module.css";
 
 const Navbar = () => {
   const { logoutUser, user } = useContext(AuthContext);
@@ -16,17 +16,17 @@ const Navbar = () => {
           </Link>
         </li>
         <li className={styles.brand}>
-          <Link to="/">
+          <Link to="/lifterlist">
             <b>Lifters</b>
           </Link>
         </li>
         <li className={styles.brand}>
-          <Link to="/">
+          <Link to="/meetresults">
             <b>Meet Results</b>
           </Link>
         </li>
         <li className={styles.brand}>
-          <Link to="/">
+          <Link to="/unitconversion">
             <b>Unit Converter</b>
           </Link>
         </li>

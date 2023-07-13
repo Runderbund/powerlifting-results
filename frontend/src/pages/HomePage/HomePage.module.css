@@ -1,0 +1,14 @@
+.container {
+    margin: 0 auto;
+    overflow: auto;
+    text-align: center;
+    min-height: 100vh;
+    background-color: burlywood;
+    /* Being decided by App.css? Need to get rid of that. */
+  }
+
+  .logo {
+    max-width: 300px;
+    /* ...other styles... */
+  }
+  
