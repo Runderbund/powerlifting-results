@@ -3,14 +3,13 @@ For now, just disconnecting from App.css and going all modular.
 Will lead to needless repetition, but clearer logic for me until the important stuff is done. */
 
 .container {
-    margin: 0 auto;
-    overflow: auto;
-    text-align: center;
-    min-height: 100vh;
-    background-color: burlywood;
-  }
+  margin: 0 auto;
+  overflow: auto;
+  text-align: center;
+  min-height: 100vh;
+  background-color: burlywood;
+}
 
-  .logo {
-    max-width: 500px;
-  }
-  
+.logo {
+  max-width: 500px;
+}
