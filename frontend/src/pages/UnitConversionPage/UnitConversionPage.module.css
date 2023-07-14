@@ -1,12 +1,13 @@
 .container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align items to the start of the container */
-    padding-top: 10vh; /* Push down content by 10% of the viewport height */
+    align-items: flex-start;
+    padding-top: 10vh;
     margin: 0 auto;
     overflow: auto;
     text-align: center;
-    min-height: 90vh; /* Reduce min-height to compensate for the added padding */
+    min-height: 90vh;
+    /* currently scrolling, thanks to NavBar */
     background-color: burlywood;
   }
   
@@ -16,6 +17,7 @@
     border: 1px solid black;
     border-radius: 5px;
     text-align: center;
+    background-color: rgb(153, 203, 247);
   }
   
   .conversionBox input[type="number"] {
