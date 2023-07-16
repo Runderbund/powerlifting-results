@@ -1,5 +1,52 @@
 from django.db import models
 
+# Limit input choices to only valid options. Display full name of choice instead of abbreviation.
+DIVISION_CHOICES = (
+    ('MR-SJ', 'Male Raw - Sub Junior'),
+    ('MR-JR', 'Male Raw - Junior'),
+    ('MR-O', 'Male Raw - Open'), 
+    ('MR-M1', 'Male Raw - Masters 1'),
+    ('MR-M2', 'Male Raw - Masters 2'),
+    ('MR-M3', 'Male Raw - Masters 3'),
+    ('MR-M4', 'Male Raw - Masters 4'),
+    ('MR-M5', 'Male Raw - Masters 5'),
+
+    ('M-SJ', 'Male Equipped - Sub Junior'),
+    ('M-JR', 'Male Equipped - Junior'), 
+    ('M-O', 'Male Equipped - Open'),
+    ('M-M1', 'Male Equipped - Masters 1'), 
+    ('M-M2', 'Male Equipped - Masters 2'),
+    ('M-M3', 'Male Equipped - Masters 3'),
+    ('M-M4', 'Male Equipped - Masters 4'),
+    ('M-M5', 'Male Equipped - Masters 5'),
+
+    ('FR-SJ', 'Female Raw - Sub Junior'),
+    ('FR-JR', 'Female Raw - Junior'),
+    ('FR-O', 'Female Raw - Open'),
+    ('FR-M1', 'Female Raw - Masters 1'),
+    ('FR-M2', 'Female Raw - Masters 2'),
+    ('FR-M3', 'Female Raw - Masters 3'),
+    ('FR-M4', 'Female Raw - Masters 4'),
+    ('FR-M5', 'Female Raw - Masters 5'),
+
+    ('F-SJ', 'Female Equipped - Sub Junior'),
+    ('F-JR', 'Female Equipped - Junior'),
+    ('F-O', 'Female Equipped - Open'),
+    ('F-M1', 'Female Equipped - Masters 1'),
+    ('F-M2', 'Female Equipped - Masters 2'), 
+    ('F-M3', 'Female Equipped - Masters 3'),
+    ('F-M4', 'Female Equipped - Masters 4'),
+    ('F-M5', 'Female Equipped - Masters 5'),
+)
+
+DISCIPLINE_CHOICES = (
+    ('S', 'Squat'),
+    ('B', 'Bench'),
+    ('D', 'Deadlift'),
+    ('T', 'Total'),  
+    ('BS', 'Bench Single Lift')
+)
+
 class Lifter(models.Model):
     member_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -8,7 +55,17 @@ class Meet(models.Model):
     meet_id = models.AutoField(primary_key=True)
     meet_name = models.CharField(max_length=255)
     meet_date = models.DateField()
-    
+
+class Record(models.Model):
+    division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
+    discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
+    weight_class_kg = models.IntegerField()
+    meet = models.ForeignKey(Meet, on_delete=models.PROTECT, null=True)
+    lifter = models.ForeignKey(Lifter, on_delete=models.PROTECT, null=True)
+    bodyweight_kg = models.FloatField() 
+    lift_weight_kg = models.FloatField()
+    date = models.DateField()
+
 class Result(models.Model):
     result_id = models.AutoField(primary_key=True)
     member = models.ForeignKey(Lifter, on_delete=models.CASCADE)
@@ -30,36 +87,9 @@ class Result(models.Model):
     points = models.FloatField()
     drug_tested = models.CharField(max_length=1)
 
-# Limit input choices to only valid options. Display full name of choice instead of abbreviation.
-CATEGORY_CHOICES = (
-    ('SJ', 'Sub Junior'),
-    ('JR', 'Junior'),
-    ('O', 'Open'),
-    ('M1', 'Masters 1'),
-    ('M2', 'Masters 2'),
-    ('M3', 'Masters 3'),
-    ('M4', 'Masters 4'),
-    ('M5', 'Masters 5'),  
-)
 
-DISCIPLINE_CHOICES = (
-    ('S', 'Squat'),
-    ('B', 'Bench'),
-    ('D', 'Deadlift'),
-    ('T', 'Total'),  
-    ('BS', 'Bench Single Lift')
-)
    
-class Record(models.Model):
-    category = models.CharField(max_length=2, choices=CATEGORY_CHOICES)
-    sex = models.CharField(max_length=1)
-    discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES)
-    weight_class = models.IntegerField()
-    meet = models.ForeignKey(Meet, on_delete=models.PROTECT) # Disallow deletion of meet if it has records associated with it.
-    lifter_name = models.CharField(max_length=50)
-    lift_weight = models.FloatField()
-    date = models.DateField()
-    bodyweight = models.FloatField()
+
 
 
 # Seems like something I can improve, but trying to get it working before I worry about efficiency. Going to continue working on this after Capstone is done anyway.
