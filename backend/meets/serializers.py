@@ -19,11 +19,15 @@ class ResultSerializer(serializers.ModelSerializer):
         model = Result
         fields = [
             "result_id",
-            "member",
+            "lifter",
             "meet",
+            "team",
+            "placing",
             "division",
-            "weight_class_kg",
             "bodyweight_kg",
+            "weight_class_kg",
+            "date_of_birth",
+            "lot",
             "squat1_kg",
             "squat2_kg",
             "squat3_kg",
@@ -35,8 +39,11 @@ class ResultSerializer(serializers.ModelSerializer):
             "deadlift3_kg",
             "total_kg",
             "points",
+            "discipline",
+            "state",
             "drug_tested",
         ]
+
 
 
 class RecordSerializer(serializers.ModelSerializer):
@@ -49,7 +56,6 @@ class RecordSerializer(serializers.ModelSerializer):
             "weight_class_kg",
             "meet",
             "lifter",
-            "bodyweight_kg",
             "lift_weight_kg",
             "date",
         ]

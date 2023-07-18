@@ -1,6 +1,7 @@
 from django.db import models
 
 # Limit input choices to only valid options. Display full name of choice instead of abbreviation.
+# Want to eventually limit to drop-downs on Entry form, but out of scope for now.
 DIVISION_CHOICES = (
     ('MR-SJ', 'Male Raw - Sub Junior'),
     ('MR-JR', 'Male Raw - Junior'),
@@ -41,20 +42,22 @@ DIVISION_CHOICES = (
 
 DISCIPLINE_CHOICES = (
     ('S', 'Squat'),
-    ('B', 'Bench'),
+    ('B', 'Bench press'),
     ('D', 'Deadlift'),
     ('T', 'Total'),  
-    ('BS', 'Bench Single Lift')
+    ('BP', 'Bench press single lift')
 )
 
 class Lifter(models.Model):
     member_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     
-class Meet(models.Model):
+class Meet(models.Model): 
     meet_id = models.AutoField(primary_key=True)
     meet_name = models.CharField(max_length=255)
     meet_date = models.DateField()
+    # Name and date come from textboxes outside of CSV (for now).
+    # Eventually State/Location and Sanction #, not important for now.
 
 class Record(models.Model):
     division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
@@ -62,18 +65,20 @@ class Record(models.Model):
     weight_class_kg = models.IntegerField()
     meet = models.ForeignKey(Meet, on_delete=models.PROTECT, null=True)
     lifter = models.ForeignKey(Lifter, on_delete=models.PROTECT, null=True)
-    bodyweight_kg = models.FloatField() 
     lift_weight_kg = models.FloatField()
     date = models.DateField()
 
 class Result(models.Model):
     result_id = models.AutoField(primary_key=True)
-    member = models.ForeignKey(Lifter, on_delete=models.CASCADE)
+    lifter = models.ForeignKey(Lifter, on_delete=models.CASCADE)
+    team = models.CharField(max_length=255)
     meet = models.ForeignKey(Meet, on_delete=models.CASCADE)
     placing = models.IntegerField()
-    division = models.CharField(max_length=255)
+    division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
     bodyweight_kg = models.FloatField()
     weight_class_kg = models.IntegerField()
+    date_of_birth = models.DateField()
+    lot = models.IntegerField()
     squat1_kg = models.FloatField(null=True)
     squat2_kg = models.FloatField(null=True)
     squat3_kg = models.FloatField(null=True)
@@ -85,11 +90,6 @@ class Result(models.Model):
     deadlift3_kg = models.FloatField(null=True)
     total_kg = models.FloatField()
     points = models.FloatField()
+    discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
+    state = models.CharField(max_length=2)
     drug_tested = models.CharField(max_length=1)
-
-
-   
-
-
-
-# Seems like something I can improve, but trying to get it working before I worry about efficiency. Going to continue working on this after Capstone is done anyway.
