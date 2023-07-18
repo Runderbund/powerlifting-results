@@ -9,7 +9,10 @@ def upload_file(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES["file"])
+            meet_name = form.cleaned_data.get('meet_name')
+            meet_date = form.cleaned_data.get('meet_date')
+            meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
+            handle_uploaded_file(request.FILES["file"], meet)
             return HttpResponseRedirect("/success/url/")
     else:
         form = UploadFileForm()
@@ -17,58 +20,29 @@ def upload_file(request):
     return render(request, "upload.html", {"form": form})
 
 
+
 def handle_uploaded_file(f, meet):
+    
     lifter_array = make_lifter_array(f, meet)
 
     for row in lifter_array:
+        name, team, div, bodyweight_kg, weight_class, date_of_birth,  lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
+
         total_kg = calculate_total()
         placing = calculate_placing()
         points = calculate_points()
         sex, equipped, age_div = deconstruct_division(div)
-
-    # Creates a new lifter if not already in database
-    lifter, created = Lifter.objects.get_or_create(
-        member_id=member_id,
-        defaults={"name": name},
-    )
-
-    
+        lifter = get_or_create_lifter(member_id, name)
+        division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
 
 
-    # Creates new result
-    Result.objects.create(
-        lifter=lifter,
-        team=team,
-        meet=meet,
-        placing=int(placing),
-        division=div,
-        bodyweight_kg=float(bwt_kg),
-        weight_class_kg=int(ipf_wt_cls),
-        date_of_birth=dob,
-        lot=int(lot),
-        squat1_kg=float(squat1) if squat1 else None,
-        squat2_kg=float(squat2) if squat2 else None,
-        squat3_kg=float(squat3) if squat3 else None,
-        bench1_kg=float(bench1) if bench1 else None,
-        bench2_kg=float(bench2) if bench2 else None,
-        bench3_kg=float(bench3) if bench3 else None,
-        deadlift1_kg=float(deadlift1) if deadlift1 else None,
-        deadlift2_kg=float(deadlift2) if deadlift2 else None,
-        deadlift3_kg=float(deadlift3) if deadlift3 else None,
-        total_kg=total_kg,
-        points=points,
-        discipline=event,
-        state=state,
-        drug_tested=drug_test,
-    )
-
-# Take in CSV file (provided by upload form), and meet (provided by text boxes), and return an array of lifters.
+# Take in CSV file and returns an array of lifters.
 def make_lifter_array(f, meet):
     lifter_array = []
     data = csv.reader(f)
-    headers = next(data, None) # Skips the headers
+    headers = next(data, None)  # Skips the headers
     for row in data:
-        if not any(row): # Stops taking in data when it hits the first blank row
+        if not any(row):  # Stops taking in data when it hits the first blank row
             break
         lifter_dict = {}
         for i, value in enumerate(row):
@@ -86,42 +60,59 @@ def make_lifter_array(f, meet):
         lifter_array.append(lifter_dict)
     return lifter_array
 
+# Gets a lifter from the database, or creates a new one.
+def get_or_create_lifter(member_id, name):
+    lifter, created = Lifter.objects.get_or_create(
+        member_id=member_id,
+        defaults={"name": name},
+    )
+    return lifter
+
+
 # Takes the division apart for easier comparison where needed, e.g., age group and birthdate comparison.
 def deconstruct_division(division):
     # Initialize the dictionary to store the components
     components = {}
-    
+
     # Check first letter of division. If M, sex = male. If F, sex = female.
     if division[0] == "M":
-        components['sex'] = "male"
+        components["sex"] = "male"
     elif division[0] == "F":
-        components['sex'] = "female"
+        components["sex"] = "female"
     else:
         raise ValueError(f"Invalid division {division}. Must start with 'M' or 'F'.")
-    
+
     # Check second letter of division. If R, equipment = raw. If nothing before dash, equipment = equipped.
     if division[1] == "R":
-        components['equipment'] = "raw"
+        components["equipment"] = "raw"
     else:
-        components['equipment'] = "equipped"
-    
+        components["equipment"] = "equipped"
+
     # Check after dash. age group = that (e.g. JR, M1, etc.)
     if "-" in division:
-        components['age_group'] = division.split("-")[1]
+        components["age_group"] = division.split("-")[1]
     else:
-        raise ValueError(f"Invalid division {division}. Must contain '-' followed by age group.")
-    
+        raise ValueError(
+            f"Invalid division {division}. Must contain '-' followed by age group."
+        )
+
     return components
+
 
 def upload_success():
     # If there is nothing that needs to be checked manually (e.g., dob in future), then this will just redirect to the next page, where changes will be displayed and the modified file will be available for download.
     pass
 
+
 # Adds best squat, bench, and deadlift together to calculate a lifter's total.
 def calculate_total(lifter):
-    squat_attempts = [lifter['squat1_kg'], lifter['squat2_kg'], lifter['squat3_kg']]
-    bench_attempts = [lifter['bench1_kg'], lifter['bench2_kg'], lifter['bench3_kg']]
-    deadlift_attempts = [lifter['deadlift1_kg'], lifter['deadlift2_kg'], lifter['deadlift3_kg']]
+    squat_attempts = [lifter["squat1_kg"], lifter["squat2_kg"], lifter["squat3_kg"]]
+    bench_attempts = [lifter["bench1_kg"], lifter["bench2_kg"], lifter["bench3_kg"]]
+    deadlift_attempts = [
+        lifter["deadlift1_kg"],
+        lifter["deadlift2_kg"],
+        lifter["deadlift3_kg"],
+    ]
 
     # Filters out unsuccessful attempts, which are negative numbers in the CSV
     successful_squats = [attempt for attempt in squat_attempts if attempt >= 0]
@@ -162,18 +153,17 @@ def calculate_points():
     # Raw Bench Press       142.40398   442.52671   0.04724
     pass
 
+
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
-def compare_dob_and_division(dob, division, meet_date):
+def compare_dob_and_division(date_of_birth, division, meet_date):
     _, age_div = deconstruct_division(division)
 
     # Calculates the lifter's age
-    age_at_meet = meet_date.year - dob.year
+    age_at_meet = meet_date.year - date_of_birth.year
 
     # Define the age groups with the minimum age for each
-    age_groups = {
-        'JR': 19, 'M1': 40, 'M2': 50, 'M3': 60, 'M4': 70, 'M5': 80
-    }
+    age_groups = {"JR": 19, "M1": 40, "M2": 50, "M3": 60, "M4": 70, "M5": 80}
 
     # Check each age group in descending order
     for age_group in sorted(age_groups.keys(), key=age_groups.get, reverse=True):
@@ -183,38 +173,39 @@ def compare_dob_and_division(dob, division, meet_date):
             break
 
     # If the lifter's division doesn't match their age, return the corrected division
-    if age_div != 'O' and age_div != correct_age_div:
+    if age_div != "O" and age_div != correct_age_div:
         division = division.replace(age_div, correct_age_div)
 
-    #TODO: Add logging
+    # TODO: Add logging
 
     return division
+
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
 def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
     WEIGHT_CLASSES = {
-        'W': {
-            43.0: '43.0',  
-            47.0: '47.0',
-            52.0: '52.0', 
-            57.0: '57.0',
-            63.0: '63.0',
-            69.0: '69.0',
-            76.0: '76.0', 
-            84.0: '84.0',
-            float('inf'): '84.0+'
+        "W": {
+            43.0: "43.0",
+            47.0: "47.0",
+            52.0: "52.0",
+            57.0: "57.0",
+            63.0: "63.0",
+            69.0: "69.0",
+            76.0: "76.0",
+            84.0: "84.0",
+            float("inf"): "84.0+",
         },
-        'M': {
-            53.0: '53.0',
-            59.0: '59.0',
-            66.0: '66.0',
-            74.0: '74.0', 
-            83.0: '83.0',
-            93.0: '93.0',
-            105.0: '105.0',
-            120.0: '120.0',
-            float('inf'): '120.0+'
-        }
+        "M": {
+            53.0: "53.0",
+            59.0: "59.0",
+            66.0: "66.0",
+            74.0: "74.0",
+            83.0: "83.0",
+            93.0: "93.0",
+            105.0: "105.0",
+            120.0: "120.0",
+            float("inf"): "120.0+",
+        },
     }
 
     for threshold in sorted(WEIGHT_CLASSES[sex]):
@@ -226,7 +217,6 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
         return correct_weight_class
     else:
         return weight_class
-
 
 
 def check_for_new_records():
@@ -251,4 +241,30 @@ def log_changes():
 
 def create_result_object(lifter_array):
     # After checks are done, created a Result object for each lifter.
+    # Creates new result
+    Result.objects.create(
+        lifter=lifter,
+        team=team,
+        meet=meet,
+        placing=int(placing),
+        division=div,
+        bodyweight_kg=float(bwt_kg),
+        weight_class_kg=int(ipf_wt_cls),
+        date_of_birth=dob,
+        lot=int(lot),
+        squat1_kg=float(squat1) if squat1 else None,
+        squat2_kg=float(squat2) if squat2 else None,
+        squat3_kg=float(squat3) if squat3 else None,
+        bench1_kg=float(bench1) if bench1 else None,
+        bench2_kg=float(bench2) if bench2 else None,
+        bench3_kg=float(bench3) if bench3 else None,
+        deadlift1_kg=float(deadlift1) if deadlift1 else None,
+        deadlift2_kg=float(deadlift2) if deadlift2 else None,
+        deadlift3_kg=float(deadlift3) if deadlift3 else None,
+        total_kg=total_kg,
+        points=points,
+        discipline=event,
+        state=state,
+        drug_tested=drug_test,
+    )
     pass

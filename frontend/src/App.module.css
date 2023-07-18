@@ -1,0 +1,14 @@
+.appContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .routesContainer {
+    flex-grow: 1;
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+}

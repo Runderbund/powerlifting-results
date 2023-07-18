@@ -1,5 +1,7 @@
 // General Imports
 import { Routes, Route } from "react-router-dom";
+import styles from './App.module.css';
+
 //import "./App.css"; useful start, but interfering with my own modular styling.
 
 // Pages Imports
@@ -20,25 +22,27 @@ import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   return (
-    <div>
+    <div className={styles.appContainer}>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/lifterlist" element={<LifterListPage />} />
-        <Route path="/lifter" element={<LifterPage />} />
-        <Route path="/meetresults" element={<MeetResultsPage />} />
-        <Route path="/unitconversion" element={<UnitConversionPage />} />
-        <Route
-          path="/upload"
-          element={
-            <PrivateRoute>
-              <ResultsUploadPage />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
+      <div className={styles.routesContainer}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/lifterlist" element={<LifterListPage />} />
+          <Route path="/lifter" element={<LifterPage />} />
+          <Route path="/meetresults" element={<MeetResultsPage />} />
+          <Route path="/unitconversion" element={<UnitConversionPage />} />
+          <Route
+            path="/upload"
+            element={
+              <PrivateRoute>
+                <ResultsUploadPage />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,68 @@
 .container {
+  align-items: flex-start;
+  padding-top: 10vh;
   margin: 0 auto;
   overflow: auto;
   text-align: center;
-  min-height: 100vh;
+  min-height: 90vh;
   background-color: burlywood;
+  font-family: Arial, sans-serif;
+}
+
+form {
+  width: 40%; /* Set the width of the form */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  background-color: white;
+  padding: 1em;
+  border-radius: 1em;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.uploadBox {
+  width: 300px;
+  padding: 2rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-align: center;
+  background-color: rgb(153, 203, 247);
+}
+
+.uploadBox input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 1rem 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+input {
+  padding: 0.5em;
+  border-radius: 0.3em;
+  border: 1px solid #ddd;
+}
+
+button {
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 0.3em;
+  background-color: royalblue;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: darkblue;
 }
