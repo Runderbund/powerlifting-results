@@ -4,39 +4,61 @@ from .forms import UploadFileForm
 import csv
 from .models import Lifter, Meet, Result
 
+
 def upload_file(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
-            return HttpResponseRedirect('/success/url/')
+            handle_uploaded_file(request.FILES["file"])
+            return HttpResponseRedirect("/success/url/")
     else:
         form = UploadFileForm()
-    return render(request, 'upload.html', {'form': form})
+    return render(request, "upload.html", {"form": form})
+
 
 def handle_uploaded_file(f, meet):
-    with open('some/file/name.txt', 'wb+') as destination:
+    with open("some/file/name.txt", "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
-    with open('some/file/name.txt', 'r') as file:
+    with open("some/file/name.txt", "r") as file:
         data = csv.reader(file)
-        headers = next(data, None) # Skips the headers
+        headers = next(data, None)  # Skips the headers
         for row in data:
-            name, team, div, bwt_kg, ipf_wt_cls, dob, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, event, state, member_id, drug_test = row
+            (
+                name,
+                team,
+                div,
+                bwt_kg,
+                ipf_wt_cls,
+                dob,
+                lot,
+                squat1,
+                squat2,
+                squat3,
+                bench1,
+                bench2,
+                bench3,
+                deadlift1,
+                deadlift2,
+                deadlift3,
+                event,
+                state,
+                member_id,
+                drug_test,
+            ) = row
             # Create array
             # Compare for placing
-            
+
             # Creates a new lifter if not already in database
             lifter, created = Lifter.objects.get_or_create(
                 member_id=member_id,
-                defaults={'name': name},
+                defaults={"name": name},
             )
 
-            total_kg = (calculate_total())
-            placing = (calculate_placing())
-            points = (calculate_points())
-
+            total_kg = calculate_total()
+            placing = calculate_placing()
+            points = calculate_points()
 
             # Creates new result
             Result.objects.create(
@@ -65,42 +87,73 @@ def handle_uploaded_file(f, meet):
                 drug_tested=drug_test,
             )
 
-
+# Take in CSV file (provided by upload form), and meet (provided by text boxes), and return an array of lifters.
 def make_lifter_array(f, meet):
-    # Take in CSV file (provided by upload form), and meet (provided through:
-    # class Meet(models.Model): 
-        # meet_id = models.AutoField(primary_key=True)
-        # meet_name = models.CharField(max_length=255)
-        # meet_date = models.DateField()
-            # Name and date come from textboxes outside of CSV (for now).)
+    lifter_array = []
+    data = csv.reader(f)
+    headers = next(data, None) # Skips the headers
+    for row in data:
+        if not any(row): # Stops taking in data when it hits the first blank row
+            break
+        lifter_dict = {}
+        for i, value in enumerate(row):
+            header = headers[i]
+            if header.endswith("_kg"):
+                if header == "weight_class_kg":
+                    lifter_dict[header] = int(value) if value else None
+                else:
+                    lifter_dict[header] = float(value) if value else None
+            elif header == "points":
+                lifter_dict[header] = float(value) if value else None
+            else:
+                lifter_dict[header] = value
+        lifter_dict["meet"] = meet
+        lifter_array.append(lifter_dict)
+    return lifter_array
 
-    #  Stop taking in data at blank row. Only grab the top section of each CSV.
-
-    # Creates an array of each row (minus the headers)
-    # Each row represents one lifter and the information about them for this meet.
-    pass
-
-def deconstruct_division():
+# Takes the division apart for easier comparison where needed, e.g., age group and birthdate.
+def deconstruct_division(division):
+    # Initialize the dictionary to store the components
+    components = {}
+    
     # Check first letter of division. If M, sex = male. If F, sex = female.
+    if division[0] == "M":
+        components['sex'] = "male"
+    elif division[0] == "F":
+        components['sex'] = "female"
+    else:
+        raise ValueError(f"Invalid division {division}. Must start with 'M' or 'F'.")
+    
     # Check second letter of division. If R, equipment = raw. If nothing before dash, equipment = equipped.
+    if division[1] == "R":
+        components['equipment'] = "raw"
+    else:
+        components['equipment'] = "equipped"
+    
     # Check after dash. age group = that (e.g. JR, M1, etc.)
-
-    # Should make it easier to update if needed, as well as calculate based on sex, equipment, and age group.
-    pass
+    if "-" in division:
+        components['age_group'] = division.split("-")[1]
+    else:
+        raise ValueError(f"Invalid division {division}. Must contain '-' followed by age group.")
+    
+    return components
 
 def upload_success():
     # If there is nothing that needs to be checked manually (e.g., dob in future), then this will just redirect to the next page, where changes will be displayed and the modified file will be available for download.
     pass
+
 
 def calculate_total():
     # Adds best squat, bench, and deadlift together
     # Anything with - (e.g. "-125") is an unsuccesful lift and should not be counted.
     pass
 
+
 def calculate_placing():
     # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
     # Later, be more specific, e.g., handle ties explicitly.
     pass
+
 
 def calculate_points():
     # Calculate IPF GoodLift points
@@ -120,19 +173,21 @@ def calculate_points():
     # Raw Bench Press       142.40398   442.52671   0.04724
     pass
 
+
 def compare_dob_and_division():
     # Check whether the lifter is in the correct division for their age, based on date_of_birth and meet_date.
     # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
-        # i.e. "Master I: from 1 January in the calendar year the lifter reaches 40 years and throughout the full calendar year in which the lifter reaches 49 years."
-        #  Junior  19-23
-        #  Open  14+ (Lifters can compete in Open and/or their specific age group
-        #  Master I  40-49
-        #  Master II  50-59
-        #  Master III  60-69
-        #  Master IV  70-79
-        #  Master V  80+
+    # i.e. "Master I: from 1 January in the calendar year the lifter reaches 40 years and throughout the full calendar year in which the lifter reaches 49 years."
+    #  Junior  19-23
+    #  Open  14+ (Lifters can compete in Open and/or their specific age group
+    #  Master I  40-49
+    #  Master II  50-59
+    #  Master III  60-69
+    #  Master IV  70-79
+    #  Master V  80+
     # If the lifter is entered in the wrong division, they will be moved to the correct division prior to calculating placing and points.
     pass
+
 
 def compare_bodyweight_and_weightclass():
     # Check whether the lifter is in the correct weight class for their bodyweight.
@@ -161,15 +216,18 @@ def compare_bodyweight_and_weightclass():
 
     pass
 
+
 def check_for_new_records():
     # Compare to matching division and lift in Records. Update if higher.
     # Should check after each lift, technically, since records can be gained and lost to the next lifter prior to meet ending, and the lifter still gets credit for setting it.
-        # Start by comparing largest in division, check in depth later.
+    # Start by comparing largest in division, check in depth later.
     pass
+
 
 def compare_name_and_member_id():
     # Check whether the name matches the member_id. If not, add to a log of errors and  send back to upload page.
     pass
+
 
 def log_changes():
     # Every time a change is made, log it to a file.
@@ -177,6 +235,7 @@ def log_changes():
     # For lifter [lifter name], weight class did not match with bodyweight. Adjusted weight class from [weight class] to [weight class].
     # Lifter [lifter name] set a new record in [division] [lift] with [lift weight] kg.
     pass
+
 
 def create_result_object(lifter_array):
     # After checks are done, created a Result object for each lifter.

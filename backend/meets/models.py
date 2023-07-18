@@ -92,4 +92,4 @@ class Result(models.Model):
     points = models.FloatField()
     discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
     state = models.CharField(max_length=2)
-    drug_tested = models.CharField(max_length=1)
+    drug_tested = models.CharField(max_length=1) # Could add Y/N as choices
