@@ -3,6 +3,9 @@ from django.http import HttpResponseRedirect
 from .forms import UploadFileForm
 import csv
 from .models import Lifter, Meet, Result
+import pandas as pd # Learn more about pandas
+import math
+
 
 
 def upload_file(request):
@@ -20,6 +23,50 @@ def upload_file(request):
     return render(request, "upload.html", {"form": form})
 
 
+# Runs through each lifter in the CSV file and resolves conflicts.
+# Then, assigns placing and points.
+# Returns an updated array of lifters and results.
+def handle_uploaded_file(f, meet):
+    
+    lifter_array = make_lifter_array(f, meet)
+    processed_lifter_data = []
+
+    for row in lifter_array:
+        name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
+
+        sex, equipped, age_div = deconstruct_division(div)
+        total_kg = calculate_total()
+        lifter = get_or_create_lifter(member_id, name)
+        division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
+        points = calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg)
+
+        # Store processed data
+        processed_lifter_data.append({
+            "name": name,
+            "team": team,
+            "division": division,
+            "bodyweight_kg": bodyweight_kg,
+            "weight_class": weight_class,
+            "date_of_birth": date_of_birth,
+            "lot": lot,
+            "total_kg": total_kg,
+            "lifter": lifter,
+            "discipline": discipline,
+            "state": state,
+            "member_id": member_id,
+            "drug_test": drug_test,
+            "sex": sex,
+            "equipped": equipped,
+            "age_div": age_div
+        })
+
+    placings = calculate_placing(processed_lifter_data)
+    points = calculate_points(processed_lifter_data)
+
+    for lifter_data in processed_lifter_data:
+        lifter_data["placing"] = placings[lifter_data["lifter"]]
+        lifter_data["points"] = points[lifter_data["lifter"]]
+
 
 def handle_uploaded_file(f, meet):
     
@@ -28,12 +75,14 @@ def handle_uploaded_file(f, meet):
     for row in lifter_array:
         name, team, div, bodyweight_kg, weight_class, date_of_birth,  lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
 
+        sex, equipped, age_div = deconstruct_division(div)
         total_kg = calculate_total()
         placing = calculate_placing()
         points = calculate_points()
-        sex, equipped, age_div = deconstruct_division(div)
         lifter = get_or_create_lifter(member_id, name)
         division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
+        points  = calculate_points()
+
 
 
 # Take in CSV file and returns an array of lifters.
@@ -186,31 +235,50 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
         return correct_weight_class
     else:
         return weight_class
-    
-def calculate_placing():
-    # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
-    # Later, be more specific, e.g., handle ties explicitly.
-    pass
+
+# Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
+# Later, be more specific, e.g., handle ties explicitly.
+def calculate_placing(lifter_array):
+    # Convert the list of dictionaries to a DataFrame for easier processing
+    dataframe = pd.DataFrame(lifter_array)
+
+    # Sort by total in descending order and then assign placing within each group
+    dataframe['placing'] = dataframe.groupby(['division', 'weight_class_kg'])['total_kg'].rank(ascending=False, method='min').astype(int)
+
+    # Convert the DataFrame back to a list of dictionaries
+    sorted_lifters = dataframe.to_dict('records')
+
+    return sorted_lifters
 
 
-def calculate_points():
-    # Calculate IPF GoodLift points
-    # 100 / (A-B*e^(-C*bodyweight_kg))
-    # Different A, B, and C based on division
-    #                       A           B           C
-    # Men’ s
-    # Equipped Powerlifting 1236.25115  1449.21864  0.01644
-    # Raw Powerlifting      1199.72839  1025.18162  0.00921
-    # Equipped Bench Press  381.22073   733.79378   0.02398
-    # Raw Bench Press       320.98041   281.40258   0.01008
 
-    # Women’ s
-    # Equipped Powerlifting 758.63878   949.31382   0.02435
-    # Raw Powerlifting      610.32796   1045.59282  0.03048
-    # Equipped Bench Press  221.82209   357.00377   0.02937
-    # Raw Bench Press       142.40398   442.52671   0.04724
-    pass
+# Calculates IPF GoodLift points
+def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
+    # Defines the coefficients for the points calculation
+    COEFFICIENTS = {
+        "male": {
+            "equipped PL": [1236.25115, 1449.21864, 0.01644],
+            "raw PL": [1199.72839, 1025.18162, 0.00921],
+            "equipped BP": [381.22073, 733.79378, 0.02398],
+            "raw BP": [320.98041, 281.40258, 0.01008]
+        },
+        "female": {
+            "equipped PL": [758.63878, 949.31382, 0.02435],
+            "raw PL": [610.32796, 1045.59282, 0.03048],
+            "equipped BP": [221.82209, 357.00377, 0.02937],
+            "raw BP": [142.40398, 442.52671, 0.04724]
+        }
+    }
 
+    # Uses the correct coefficients based on the sex, equipment, and discipline
+    coefficients = COEFFICIENTS[sex][f"{equipped} {discipline}"]
+    A, B, C = coefficients
+
+    points = 100 / (A - B * (math.exp(-C * bodyweight_kg))) * total_kg
+
+    return points
+
+# TODO: Add Dl/PP events
 
 
 
