@@ -3,24 +3,31 @@ from django.http import HttpResponseRedirect
 from .forms import UploadFileForm
 import csv
 from .models import Lifter, Meet, Result
-import pandas as pd # Learn more about pandas
+import pandas as pd  # Learn more about pandas
 import math
+# from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes
 
 
 
+# @permission_classes([IsAuthenticated])
+@api_view(['POST'])
 def upload_file(request):
-    if request.method == "POST":
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            meet_name = form.cleaned_data.get('meet_name')
-            meet_date = form.cleaned_data.get('meet_date')
-            meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
-            handle_uploaded_file(request.FILES["file"], meet)
-            return HttpResponseRedirect("/success/url/")
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        meet_name = form.cleaned_data.get('meetName')
+        meet_date = form.cleaned_data.get('meetDate')
+        meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
+        result_objects = handle_uploaded_file(request.FILES["resultsFile"], meet)
+        # Save result_objects to the database
+        Result.objects.bulk_create(result_objects)
+        return HttpResponseRedirect("/success/url/")
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
     return render(request, "upload.html", {"form": form})
+
+
 
 
 # Runs through each lifter in the CSV file and resolves conflicts.
@@ -40,38 +47,46 @@ def handle_uploaded_file(f, meet):
         points = calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg)
 
         # Store processed data
-        processed_lifter_data.append({
-            "name": name,
-            "team": team,
-            "division": division,
-            "bodyweight_kg": bodyweight_kg,
-            "weight_class": weight_class,
-            "date_of_birth": date_of_birth,
-            "lot": lot,
-            "total_kg": total_kg,
-            "lifter": lifter,
-            "discipline": discipline,
-            "state": state,
-            "member_id": member_id,
-            "drug_test": drug_test,
-            "sex": sex,
-            "equipped": equipped,
-            "age_div": age_div,
-            "points": points,
-            "squat1": squat1,
-            "squat2": squat2,
-            "squat3": squat3,
-            "bench1": bench1,
-            "bench2": bench2,
-            "bench3": bench3,
-            "deadlift1": deadlift1,
-            "deadlift2": deadlift2,
-            "deadlift3": deadlift3
-        })
+        processed_lifter_data.append(
+            {
+                "name": name,
+                "team": team,
+                "division": division,
+                "bodyweight_kg": bodyweight_kg,
+                "weight_class": weight_class,
+                "date_of_birth": date_of_birth,
+                "lot": lot,
+                "total_kg": total_kg,
+                "lifter": lifter,
+                "discipline": discipline,
+                "state": state,
+                "member_id": member_id,
+                "drug_test": drug_test,
+                "sex": sex,
+                "equipped": equipped,
+                "age_div": age_div,
+                "points": points,
+                "squat1": squat1,
+                "squat2": squat2,
+                "squat3": squat3,
+                "bench1": bench1,
+                "bench2": bench2,
+                "bench3": bench3,
+                "deadlift1": deadlift1,
+                "deadlift2": deadlift2,
+                "deadlift3": deadlift3,
+            }
+        )
 
     processed_lifter_data = calculate_placing(processed_lifter_data)
+    result_objects = []
+    for lifter_data in processed_lifter_data:
+        result = Result.objects.create(**lifter_data) # Unpacks the dictionary
+        result_objects.append(result)
+        # Create Lifter, Meet, and Record objects
 
-    return processed_lifter_data
+    return result_objects
+
 
 
 # Take in CSV file and returns an array of lifters.
@@ -97,6 +112,7 @@ def make_lifter_array(f, meet):
         lifter_dict["meet"] = meet
         lifter_array.append(lifter_dict)
     return lifter_array
+
 
 # Gets a lifter from the database, or creates a new one.
 def get_or_create_lifter(member_id, name):
@@ -160,6 +176,7 @@ def calculate_total(lifter):
     total = best_squat + best_bench + best_deadlift
 
     return total
+
 
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
@@ -225,25 +242,26 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
     else:
         return weight_class
 
+
 # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
 # Double check how to handle ties. Bodyweight, or lot number?
-    # For now, assigns same rank to ties
+# For now, assigns same rank to ties
 def calculate_placing(lifter_data):
     # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(lifter_data)
 
     # Calculate the placings within each division and weight class
-    df['placing'] = df.groupby(['division', 'weight_class'])['total_kg'].rank(ascending=False, method='min')
+    df["placing"] = df.groupby(["division", "weight_class"])["total_kg"].rank(
+        ascending=False, method="min"
+    )
 
     # Convert the placings to integers
-    df['placing'] = df['placing'].astype(int)
+    df["placing"] = df["placing"].astype(int)
 
     # Convert the DataFrame back to a list of dictionaries
-    lifter_data = df.to_dict('records')
+    lifter_data = df.to_dict("records")
 
     return lifter_data
-
-
 
 
 # Calculates IPF GoodLift points
@@ -254,14 +272,14 @@ def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
             "equipped PL": [1236.25115, 1449.21864, 0.01644],
             "raw PL": [1199.72839, 1025.18162, 0.00921],
             "equipped BP": [381.22073, 733.79378, 0.02398],
-            "raw BP": [320.98041, 281.40258, 0.01008]
+            "raw BP": [320.98041, 281.40258, 0.01008],
         },
         "female": {
             "equipped PL": [758.63878, 949.31382, 0.02435],
             "raw PL": [610.32796, 1045.59282, 0.03048],
             "equipped BP": [221.82209, 357.00377, 0.02937],
-            "raw BP": [142.40398, 442.52671, 0.04724]
-        }
+            "raw BP": [142.40398, 442.52671, 0.04724],
+        },
     }
 
     # Uses the correct coefficients based on the sex, equipment, and discipline
@@ -272,9 +290,8 @@ def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
 
     return points
 
+
 # TODO: Add Dl/PP events
-
-
 
 
 def check_for_new_records():
@@ -297,35 +314,38 @@ def log_changes():
     pass
 
 
-def create_result_object(lifter_array):
-    # After checks are done, created a Result object for each lifter.
-    # Creates new result
-    # Result.objects.create(
-    #     lifter=lifter,
-    #     team=team,
-    #     meet=meet,
-    #     placing=int(placing),
-    #     division=div,
-    #     bodyweight_kg=float(bwt_kg),
-    #     weight_class_kg=int(ipf_wt_cls),
-    #     date_of_birth=dob,
-    #     lot=int(lot),
-    #     squat1_kg=float(squat1) if squat1 else None,
-    #     squat2_kg=float(squat2) if squat2 else None,
-    #     squat3_kg=float(squat3) if squat3 else None,
-    #     bench1_kg=float(bench1) if bench1 else None,
-    #     bench2_kg=float(bench2) if bench2 else None,
-    #     bench3_kg=float(bench3) if bench3 else None,
-    #     deadlift1_kg=float(deadlift1) if deadlift1 else None,
-    #     deadlift2_kg=float(deadlift2) if deadlift2 else None,
-    #     deadlift3_kg=float(deadlift3) if deadlift3 else None,
-    #     total_kg=total_kg,
-    #     points=points,
-    #     discipline=event,
-    #     state=state,
-    #     drug_tested=drug_test,
-    # )
-    pass
+def create_result_objects(processed_lifter_data, meet):
+    result_objects = []
+    for data in processed_lifter_data:
+        result = Result(
+            lifter=data["lifter"],
+            team=data.get("team", ""),
+            meet=meet,
+            placing=data["placing"],
+            division=data["division"],
+            bodyweight_kg=data["bodyweight_kg"],
+            weight_class_kg=data["weight_class"],
+            date_of_birth=data["date_of_birth"],
+            lot=data["lot"],
+            squat1_kg=data.get("squat1", None),
+            squat2_kg=data.get("squat2", None),
+            squat3_kg=data.get("squat3", None),
+            bench1_kg=data.get("bench1", None),
+            bench2_kg=data.get("bench2", None),
+            bench3_kg=data.get("bench3", None),
+            deadlift1_kg=data.get("deadlift1", None),
+            deadlift2_kg=data.get("deadlift2", None),
+            deadlift3_kg=data.get("deadlift3", None),
+            total_kg=data["total_kg"],
+            points=data["points"],
+            discipline=data["discipline"],
+            state=data["state"],
+            drug_tested=data["drug_test"],
+        )
+        result.save()
+        result_objects.append(result)
+    return result_objects
+
 
 
 def upload_success():
