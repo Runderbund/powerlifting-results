@@ -40,6 +40,19 @@ def handle_uploaded_file(f, meet):
     for row in lifter_array:
         name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
 
+        # These cells may be blank in the CSV.
+        # This uses the get method to default to None in that case.
+        team = row.get('team')
+        squat1 = row.get('squat1')
+        squat2 = row.get('squat2')
+        squat3 = row.get('squat3')
+        bench1 = row.get('bench1')
+        bench2 = row.get('bench2')
+        bench3 = row.get('bench3')
+        deadlift1 = row.get('deadlift1')
+        deadlift2 = row.get('deadlift2')
+        deadlift3 = row.get('deadlift3')
+
         sex, equipped, age_div = deconstruct_division(div)
         total_kg = calculate_total()
         lifter = get_or_create_lifter(member_id, name)
