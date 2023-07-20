@@ -27,7 +27,6 @@ def upload_file(request):
 # Then, assigns placing and points.
 # Returns an updated array of lifters and results.
 def handle_uploaded_file(f, meet):
-    
     lifter_array = make_lifter_array(f, meet)
     processed_lifter_data = []
 
@@ -57,32 +56,22 @@ def handle_uploaded_file(f, meet):
             "drug_test": drug_test,
             "sex": sex,
             "equipped": equipped,
-            "age_div": age_div
+            "age_div": age_div,
+            "points": points,
+            "squat1": squat1,
+            "squat2": squat2,
+            "squat3": squat3,
+            "bench1": bench1,
+            "bench2": bench2,
+            "bench3": bench3,
+            "deadlift1": deadlift1,
+            "deadlift2": deadlift2,
+            "deadlift3": deadlift3
         })
 
-    placings = calculate_placing(processed_lifter_data)
-    points = calculate_points(processed_lifter_data)
+    processed_lifter_data = calculate_placing(processed_lifter_data)
 
-    for lifter_data in processed_lifter_data:
-        lifter_data["placing"] = placings[lifter_data["lifter"]]
-        lifter_data["points"] = points[lifter_data["lifter"]]
-
-
-def handle_uploaded_file(f, meet):
-    
-    lifter_array = make_lifter_array(f, meet)
-
-    for row in lifter_array:
-        name, team, div, bodyweight_kg, weight_class, date_of_birth,  lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
-
-        sex, equipped, age_div = deconstruct_division(div)
-        total_kg = calculate_total()
-        placing = calculate_placing()
-        points = calculate_points()
-        lifter = get_or_create_lifter(member_id, name)
-        division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
-        points  = calculate_points()
-
+    return processed_lifter_data
 
 
 # Take in CSV file and returns an array of lifters.
@@ -237,18 +226,23 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
         return weight_class
 
 # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
-# Later, be more specific, e.g., handle ties explicitly.
-def calculate_placing(lifter_array):
-    # Convert the list of dictionaries to a DataFrame for easier processing
-    dataframe = pd.DataFrame(lifter_array)
+# Double check how to handle ties. Bodyweight, or lot number?
+    # For now, assigns same rank to ties
+def calculate_placing(lifter_data):
+    # Convert the list of dictionaries to a DataFrame
+    df = pd.DataFrame(lifter_data)
 
-    # Sort by total in descending order and then assign placing within each group
-    dataframe['placing'] = dataframe.groupby(['division', 'weight_class_kg'])['total_kg'].rank(ascending=False, method='min').astype(int)
+    # Calculate the placings within each division and weight class
+    df['placing'] = df.groupby(['division', 'weight_class'])['total_kg'].rank(ascending=False, method='min')
+
+    # Convert the placings to integers
+    df['placing'] = df['placing'].astype(int)
 
     # Convert the DataFrame back to a list of dictionaries
-    sorted_lifters = dataframe.to_dict('records')
+    lifter_data = df.to_dict('records')
 
-    return sorted_lifters
+    return lifter_data
+
 
 
 
