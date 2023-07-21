@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import upload_file, list_lifters, lifter_detail, list_meets, meet_results
-# Views have not been created yet (aside from upload). Setting urls first.
+
 urlpatterns = [
     path('upload/', upload_file, name='upload_file'),
     # path('success/', views.upload_success, name='upload_success'),
