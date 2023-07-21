@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from .forms import UploadFileForm
 import csv
 from .models import Lifter, Meet, Result
@@ -15,6 +15,7 @@ from datetime import datetime
 
 # @permission_classes([IsAuthenticated])
 # Needed? Button is only there when logged in, and already diverts to login page if not logged in.
+
 @api_view(['POST'])
 def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
@@ -23,13 +24,11 @@ def upload_file(request):
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
         handle_uploaded_file(request.FILES["resultsFile"], meet)
-        return HttpResponseRedirect("/success/url/")
+        return HttpResponse("File uploaded successfully")
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
     return render(request, "upload.html", {"form": form})
-
-
 
 
 
@@ -128,7 +127,6 @@ def get_or_create_lifter(member_id, name):
 # Takes the division apart for easier comparison where needed, e.g., age group and birthdate comparison.
 def deconstruct_division(division):
     # Initialize the dictionary to store the components
-    # print ("DIVISION:", division)
     components = {}
 
     # Check first letter of division. If M, sex = male. If F, sex = female.
