@@ -54,6 +54,7 @@ def handle_uploaded_file(f, meet):
 
         processed_lifter_data.append(
             {
+                "meet": meet,
                 "lifter": lifter,
                 "team": team,
                 "division": division,
