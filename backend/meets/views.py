@@ -23,7 +23,7 @@ def upload_file(request):
         meet_name = form.cleaned_data.get('meetName')
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
-        handle_uploaded_file(request.FILES["resultsFile"], meet)
+        result_objects = handle_uploaded_file(request.FILES["resultsFile"], meet)
         return HttpResponse("File uploaded successfully")
     else:
         form = UploadFileForm()

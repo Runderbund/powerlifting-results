@@ -47,11 +47,6 @@ const ResultsUploadPage = () => {
         </label>
         <button type="submit">Upload</button>
       </form>
-      <div>
-        {results.map((result, index) => (
-          <p key={index}>{JSON.stringify(result)}</p>
-        ))}
-      </div>
     </div>
   );
 };

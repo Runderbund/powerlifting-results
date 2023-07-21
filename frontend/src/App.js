@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import LifterListPage from "./pages/LifterListPage/LifterListPage";
 import LifterPage from "./pages/LifterPage/LifterPage";
 import MeetResultsPage from "./pages/MeetResultsPage/MeetResultsPage";
+import MeetListPage from "./pages/MeetListPage/MeetListPage";
 import ResultsUploadPage from "./pages/ResultsUploadPage/ResultsUploadPage";
 import UnitConversionPage from "./pages/UnitConversionPage/UnitConversionPage";
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/lifterlist" element={<LifterListPage />} />
         <Route path="/lifter" element={<LifterPage />} />
         <Route path="/meetresults" element={<MeetResultsPage />} />
+        <Route path="/meetlist" element={<MeetListPage />} />
         <Route path="/unitconversion" element={<UnitConversionPage />} />
         <Route
           path="/upload"
