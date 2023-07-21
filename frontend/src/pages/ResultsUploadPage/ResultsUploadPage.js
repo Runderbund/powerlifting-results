@@ -1,14 +1,30 @@
 import React from "react";
 import styles from "./ResultsUploadPage.module.css";
+import axios from "axios";
 
 const ResultsUploadPage = () => {
-  // Event handler for the form submission
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Here you can handle the form data, for example, send it to a server
-    console.log(event.target.meetName.value);
-    console.log(event.target.meetDate.value);
-    console.log(event.target.resultsFile.files[0]);
+
+    const formData = new FormData();
+    formData.append("meetName", event.target.meetName.value);
+    formData.append("meetDate", event.target.meetDate.value);
+    formData.append("resultsFile", event.target.resultsFile.files[0]);
+
+    axios
+      .post("http://localhost:8000/upload/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        console.log("File uploaded successfully");
+      })
+      .catch((error) => {
+        console.log("File upload failed");
+        console.log(error);
+      });
   };
 
   return (

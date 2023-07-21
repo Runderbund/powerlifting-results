@@ -11,6 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 
 # @permission_classes([IsAuthenticated])
+# Needed? Button is only there when logged in, and already diverts to login page if not logged in.
 @api_view(['POST'])
 def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
@@ -18,14 +19,13 @@ def upload_file(request):
         meet_name = form.cleaned_data.get('meetName')
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
-        result_objects = handle_uploaded_file(request.FILES["resultsFile"], meet)
-        # Save result_objects to the database
-        Result.objects.bulk_create(result_objects)
+        handle_uploaded_file(request.FILES["resultsFile"], meet)
         return HttpResponseRedirect("/success/url/")
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
     return render(request, "upload.html", {"form": form})
+
 
 
 
