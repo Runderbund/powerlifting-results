@@ -48,6 +48,16 @@ DISCIPLINE_CHOICES = (
     ('BP', 'Bench press single lift')
 )
 
+SEX_CHOICES = (
+    ('M', 'male'),
+    ('F', 'female')
+)
+
+EQUIPMENT_CHOICES = (
+    ('E', 'equipped'),
+    ('R', 'raw')
+)
+
 class Lifter(models.Model):
     member_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -68,28 +78,34 @@ class Record(models.Model):
     lift_weight_kg = models.FloatField()
     date = models.DateField()
 
+# Added null=True to all fields to avoid errors. Adjust later once I figure out main areas.
 class Result(models.Model):
     result_id = models.AutoField(primary_key=True)
-    lifter = models.ForeignKey(Lifter, on_delete=models.CASCADE)
-    team = models.CharField(max_length=255)
-    meet = models.ForeignKey(Meet, on_delete=models.CASCADE)
-    placing = models.IntegerField()
+    meet = models.ForeignKey(Meet, on_delete=models.CASCADE, null=True)
+    lifter = models.ForeignKey(Lifter, on_delete=models.CASCADE, null=True)
+        # instead of name and member_id. Linked to lifter, which includes both
+        # Not sure how to handle listing results for individual lifter efficiently. Current plan involves matching across all results for member_id, but this involves checking the whole thing every time a lifter page loads.
+    team = models.CharField(max_length=255, null=True)
     division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
-    bodyweight_kg = models.FloatField()
-    weight_class_kg = models.IntegerField()
-    date_of_birth = models.DateField()
-    lot = models.IntegerField()
-    squat1_kg = models.FloatField(null=True)
-    squat2_kg = models.FloatField(null=True)
-    squat3_kg = models.FloatField(null=True)
-    bench1_kg = models.FloatField(null=True) 
-    bench2_kg = models.FloatField(null=True)
-    bench3_kg = models.FloatField(null=True)
-    deadlift1_kg = models.FloatField(null=True)
-    deadlift2_kg = models.FloatField(null=True) 
-    deadlift3_kg = models.FloatField(null=True)
-    total_kg = models.FloatField()
-    points = models.FloatField()
+    sex = models.CharField(max_length=100, choices=SEX_CHOICES, null=True)
+    equipment = models.CharField(max_length=100, choices=EQUIPMENT_CHOICES, null=True)
+    age_group = models.CharField(max_length=200, null=True)
+    bodyweight = models.FloatField(null=True)
+    weight_class = models.IntegerField(null=True)
+    date_of_birth = models.DateField(null=True)
+    lot = models.IntegerField(null=True)
+    squat1 = models.FloatField(null=True)
+    squat2 = models.FloatField(null=True)
+    squat3 = models.FloatField(null=True)
+    bench1 = models.FloatField(null=True) 
+    bench2 = models.FloatField(null=True)
+    bench3 = models.FloatField(null=True)
+    deadlift1 = models.FloatField(null=True)
+    deadlift2 = models.FloatField(null=True) 
+    deadlift3 = models.FloatField(null=True)
+    total = models.FloatField(null=True)
     discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
-    state = models.CharField(max_length=2)
-    drug_tested = models.CharField(max_length=1) # Could add Y/N as choices
+    points = models.FloatField(null=True)
+    state = models.CharField(max_length=2, null=True)
+    placing = models.IntegerField(null=True)
+    drug_tested = models.CharField(max_length=1, null=True) # Could add Y/N as choices

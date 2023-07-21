@@ -13,36 +13,39 @@ class MeetSerializer(serializers.ModelSerializer):
         model = Meet
         fields = ["meet_id", "meet_name", "meet_date"]
 
-
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = [
             "result_id",
-            "lifter",
             "meet",
+            "lifter",
             "team",
-            "placing",
             "division",
-            "bodyweight_kg",
-            "weight_class_kg",
+            "sex",
+            "equipment",
+            "age_group",
+            "bodyweight",
+            "weight_class",
             "date_of_birth",
             "lot",
-            "squat1_kg",
-            "squat2_kg",
-            "squat3_kg",
-            "bench1_kg",
-            "bench2_kg",
-            "bench3_kg",
-            "deadlift1_kg",
-            "deadlift2_kg",
-            "deadlift3_kg",
-            "total_kg",
-            "points",
+            "squat1",
+            "squat2",
+            "squat3",
+            "bench1",
+            "bench2",
+            "bench3",
+            "deadlift1",
+            "deadlift2",
+            "deadlift3",
+            "total",
             "discipline",
+            "points",
             "state",
+            "placing",
             "drug_tested",
         ]
+
 
 
 

@@ -41,38 +41,27 @@ def handle_uploaded_file(f, meet):
     processed_lifter_data = []
 
     for row in lifter_array:
-        name, team, division, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet = row.values()
+        name, team, division, bodyweight, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_tested, meet = row.values()
 
-        sex, equipped, age_div = deconstruct_division(division)
-        print (sex, equipped, age_div)
-        #returning "sex equipment age_group", not the specifics
+        division_components = deconstruct_division(division)
+        sex = division_components['sex']
+        equipment = division_components['equipment']
+        age_group = division_components['age_group']
 
-        total_kg = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
+        total = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
         lifter = get_or_create_lifter(member_id, name)
         division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
-        points = calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg)
+        points = calculate_points(sex, equipment, discipline, total, bodyweight)
 
-
-        # Store processed data
         processed_lifter_data.append(
             {
-                "name": name,
+                "lifter": lifter,
                 "team": team,
                 "division": division,
-                "bodyweight_kg": bodyweight_kg,
+                "bodyweight": bodyweight,
                 "weight_class": weight_class,
                 "date_of_birth": date_of_birth,
                 "lot": lot,
-                "total_kg": total_kg,
-                "lifter": lifter,
-                "discipline": discipline,
-                "state": state,
-                "member_id": member_id,
-                "drug_test": drug_test,
-                "sex": sex,
-                "equipped": equipped,
-                "age_div": age_div,
-                "points": points,
                 "squat1": squat1,
                 "squat2": squat2,
                 "squat3": squat3,
@@ -82,6 +71,14 @@ def handle_uploaded_file(f, meet):
                 "deadlift1": deadlift1,
                 "deadlift2": deadlift2,
                 "deadlift3": deadlift3,
+                "total": total,
+                "discipline": discipline,
+                "state": state,
+                "drug_tested": drug_tested,
+                "sex": sex,
+                "equipment": equipment,
+                "age_group": age_group,
+                "points": points,
             }
         )
 
@@ -155,8 +152,7 @@ def deconstruct_division(division):
         raise ValueError(
             f"Invalid division {division}. Must contain '-' followed by age group."
         )
-
-    print ("COMPONENTS", components)
+    
     return components
 
 
@@ -258,7 +254,7 @@ def calculate_placing(lifter_data):
     df = pd.DataFrame(lifter_data)
 
     # Calculate the placings within each division and weight class
-    df["placing"] = df.groupby(["division", "weight_class"])["total_kg"].rank(
+    df["placing"] = df.groupby(["division", "weight_class"])["total"].rank(
         ascending=False, method="min"
     )
 
@@ -272,8 +268,7 @@ def calculate_placing(lifter_data):
 
 
 # Calculates IPF GoodLift points
-def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
-    print ("POINTS VARIABLES:", [sex], equipped, discipline, total_kg, bodyweight_kg )
+def calculate_points(sex, equipped, discipline, total, bodyweight):
     # Defines the coefficients for the points calculation
     COEFFICIENTS = {
         "male": {
@@ -294,7 +289,7 @@ def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
     coefficients = COEFFICIENTS[sex][f"{equipped} {discipline}"]
     A, B, C = coefficients
 
-    points = 100 / (A - B * (math.exp(-C * bodyweight_kg))) * total_kg
+    points = 100 / (A - B * (math.exp(-C * bodyweight))) * total
 
     return points
 
@@ -322,37 +317,41 @@ def log_changes():
     pass
 
 
-def create_result_objects(processed_lifter_data, meet):
-    result_objects = []
-    for data in processed_lifter_data:
-        result = Result(
-            lifter=data["lifter"],
-            team=data.get("team", ""),
-            meet=meet,
-            placing=data["placing"],
-            division=data["division"],
-            bodyweight_kg=data["bodyweight_kg"],
-            weight_class_kg=data["weight_class"],
-            date_of_birth=data["date_of_birth"],
-            lot=data["lot"],
-            squat1_kg=data.get("squat1", None),
-            squat2_kg=data.get("squat2", None),
-            squat3_kg=data.get("squat3", None),
-            bench1_kg=data.get("bench1", None),
-            bench2_kg=data.get("bench2", None),
-            bench3_kg=data.get("bench3", None),
-            deadlift1_kg=data.get("deadlift1", None),
-            deadlift2_kg=data.get("deadlift2", None),
-            deadlift3_kg=data.get("deadlift3", None),
-            total_kg=data["total_kg"],
-            points=data["points"],
-            discipline=data["discipline"],
-            state=data["state"],
-            drug_tested=data["drug_test"],
-        )
-        result.save()
-        result_objects.append(result)
-    return result_objects
+#  Not needed with for snippet at bottom of handle_uploaded_file
+# def create_result_objects(processed_lifter_data, meet):
+#     result_objects = []
+#     for data in processed_lifter_data:
+#         result = Result(
+#             meet=data["meet"],
+#             lifter=data["lifter"],
+#             team=data["team"],
+#             division=data["division"],
+#             bodyweight=data["bodyweight"],
+#             weight_class=data["weight_class"],
+#             date_of_birth=data["date_of_birth"],
+#             lot=data["lot"],
+#             squat1=data.get("squat1"),
+#             squat2=data.get("squat2"),
+#             squat3=data.get("squat3"),
+#             bench1=data.get("bench1"),
+#             bench2=data.get("bench2"),
+#             bench3=data.get("bench3"),
+#             deadlift1=data.get("deadlift1"),
+#             deadlift2=data.get("deadlift2"),
+#             deadlift3=data.get("deadlift3"),
+#             total=data["total"],
+#             discipline=data["discipline"],
+#             state=data["state"],
+#             member_id=data["member_id"],
+#             drug_test=data["drug_test"],
+#             sex=data["sex"],
+#             equipment=data["equipment"],
+#             age_group=data["age_group"],
+#             points=data["points"],
+#         )
+#         result.save()
+#         result_objects.append(result)
+#     return result_objects
 
 
 
