@@ -5,6 +5,7 @@ import csv
 from .models import Lifter, Meet, Result
 import pandas as pd  # Learn more about pandas
 import math
+import io
 # from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 
@@ -38,23 +39,34 @@ def handle_uploaded_file(f, meet):
     processed_lifter_data = []
 
     for row in lifter_array:
-        name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test = row.values()
+        name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet = row.values()
+        
+        values = list(row.values())
+
+        print("BEFORE:")
+        print (row)
+        print (name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet)
 
         # These cells may be blank in the CSV.
         # This uses the get method to default to None in that case.
-        team = row.get('team')
-        squat1 = row.get('squat1')
-        squat2 = row.get('squat2')
-        squat3 = row.get('squat3')
-        bench1 = row.get('bench1')
-        bench2 = row.get('bench2')
-        bench3 = row.get('bench3')
-        deadlift1 = row.get('deadlift1')
-        deadlift2 = row.get('deadlift2')
-        deadlift3 = row.get('deadlift3')
+        team = row.get('Team')
+        squat1 = row.get('Squat 1')
+        squat2 = row.get('Squat 2')
+        squat3 = row.get('Squat 3')
+        bench1 = row.get('Bench 1')
+        bench2 = row.get('Bench 2')
+        bench3 = row.get('Bench 3')
+        deadlift1 = row.get('Deadlift 1')
+        deadlift2 = row.get('Deadlift 2')
+        deadlift3 = row.get('Deadlift 3')
+
+        print("AFTER:")
+        print (row)
+        print (name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet)
+
 
         sex, equipped, age_div = deconstruct_division(div)
-        total_kg = calculate_total()
+        total_kg = calculate_total(row)
         lifter = get_or_create_lifter(member_id, name)
         division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
         points = calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg)
@@ -105,7 +117,7 @@ def handle_uploaded_file(f, meet):
 # Take in CSV file and returns an array of lifters.
 def make_lifter_array(f, meet):
     lifter_array = []
-    data = csv.reader(f)
+    data = csv.reader(io.TextIOWrapper(f, encoding='utf-8'))
     headers = next(data, None)  # Skips the headers
     for row in data:
         if not any(row):  # Stops taking in data when it hits the first blank row
@@ -113,18 +125,14 @@ def make_lifter_array(f, meet):
         lifter_dict = {}
         for i, value in enumerate(row):
             header = headers[i]
-            if header.endswith("_kg"):
-                if header == "weight_class_kg":
-                    lifter_dict[header] = int(value) if value else None
-                else:
-                    lifter_dict[header] = float(value) if value else None
-            elif header == "points":
+            if header == 'Bwt - kg' or header in ['Squat 1', 'Squat 2', 'Squat 3', 'Bench 1', 'Bench 2', 'Bench 3', 'Deadlift 1', 'Deadlift 2', 'Deadlift 3']:
                 lifter_dict[header] = float(value) if value else None
             else:
                 lifter_dict[header] = value
         lifter_dict["meet"] = meet
         lifter_array.append(lifter_dict)
     return lifter_array
+
 
 
 # Gets a lifter from the database, or creates a new one.
@@ -167,19 +175,18 @@ def deconstruct_division(division):
 
 
 # Adds best squat, bench, and deadlift together to calculate a lifter's total.
-def calculate_total(lifter):
-    squat_attempts = [lifter["squat1_kg"], lifter["squat2_kg"], lifter["squat3_kg"]]
-    bench_attempts = [lifter["bench1_kg"], lifter["bench2_kg"], lifter["bench3_kg"]]
-    deadlift_attempts = [
-        lifter["deadlift1_kg"],
-        lifter["deadlift2_kg"],
-        lifter["deadlift3_kg"],
-    ]
+def calculate_total(row):
+    squat_attempts = [row["squat1"], row["squat2"], row["squat3"]]
+    bench_attempts = [row["bench1"], row["bench2"], row["bench3"]]
+    deadlift_attempts = [row["deadlift1"], row["deadlift2"], row["deadlift3"],]
+
+    
 
     # Filters out unsuccessful attempts, which are negative numbers in the CSV
-    successful_squats = [attempt for attempt in squat_attempts if attempt >= 0]
-    successful_benches = [attempt for attempt in bench_attempts if attempt >= 0]
-    successful_deadlifts = [attempt for attempt in deadlift_attempts if attempt >= 0]
+    successful_squats = [attempt for attempt in squat_attempts if attempt is not None and attempt >= 0]
+    successful_benches = [attempt for attempt in bench_attempts if attempt is not None and attempt >= 0]
+    successful_deadlifts = [attempt for attempt in deadlift_attempts if attempt is not None and attempt >= 0]
+
 
     # If there are no successful attempts for a lift, that lift is 0. Otherwise, it's the heaviest of the successful attempts.
     best_squat = max(successful_squats) if successful_squats else 0

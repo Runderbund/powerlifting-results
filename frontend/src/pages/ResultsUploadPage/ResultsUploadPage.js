@@ -1,8 +1,9 @@
-import React from "react";
-import styles from "./ResultsUploadPage.module.css";
+import React, { useState } from "react";
 import axios from "axios";
+import styles from "./ResultsUploadPage.module.css";
 
 const ResultsUploadPage = () => {
+  const [results, setResults] = useState([]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -13,13 +14,14 @@ const ResultsUploadPage = () => {
     formData.append("resultsFile", event.target.resultsFile.files[0]);
 
     axios
-      .post("http://localhost:8000/upload/", formData, {
+      .post("http://localhost:8000/meets/upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
       .then((response) => {
         console.log("File uploaded successfully");
+        setResults(response.data);
       })
       .catch((error) => {
         console.log("File upload failed");
@@ -45,10 +47,16 @@ const ResultsUploadPage = () => {
         </label>
         <button type="submit">Upload</button>
       </form>
+      <div>
+        {results.map((result, index) => (
+          <p key={index}>{JSON.stringify(result)}</p>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default ResultsUploadPage;
+
 
 // TODO: Add drag and drop capability with react-dropzone
