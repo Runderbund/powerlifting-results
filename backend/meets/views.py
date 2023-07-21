@@ -9,7 +9,8 @@ import io
 # from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
-
+from django.http import JsonResponse
+from .models import Lifter, Meet, Result
 
 
 
@@ -358,3 +359,23 @@ def log_changes():
 def upload_success():
     # If there is nothing that needs to be checked manually (e.g., dob in future), then this will just redirect to the next page, where changes will be displayed and the modified file will be available for download.
     pass
+
+
+def list_lifters(request):
+    lifters = Lifter.objects.all().values('member_id', 'name')
+    return JsonResponse({'lifters': list(lifters)})
+
+def lifter_detail(request, lifter_id):
+    lifter = Lifter.objects.filter(member_id=lifter_id).values()
+    results = Result.objects.filter(lifter__member_id=lifter_id).values()
+    return JsonResponse({'lifter': list(lifter), 'results': list(results)})
+
+
+def list_meets(request):
+    meets = Meet.objects.all().values('meet_id', 'meet_name')
+    return JsonResponse({'meets': list(meets)})
+
+def meet_results(request, meet_id):
+    meet = Meet.objects.filter(meet_id=meet_id).values()
+    results = Result.objects.filter(meet__meet_id=meet_id).values()
+    return JsonResponse({'meet': list(meet), 'results': list(results)})
