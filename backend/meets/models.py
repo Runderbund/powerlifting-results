@@ -91,7 +91,7 @@ class Result(models.Model):
     equipment = models.CharField(max_length=100, choices=EQUIPMENT_CHOICES, null=True)
     age_group = models.CharField(max_length=200, null=True)
     bodyweight = models.FloatField(null=True)
-    weight_class = models.IntegerField(null=True)
+    weight_class = models.CharField(max_length=5, null=True)
     date_of_birth = models.DateField(null=True)
     lot = models.IntegerField(null=True)
     squat1 = models.FloatField(null=True)
