@@ -8,6 +8,8 @@ import math
 import io
 # from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
+from datetime import datetime
+
 
 
 
@@ -39,37 +41,17 @@ def handle_uploaded_file(f, meet):
     processed_lifter_data = []
 
     for row in lifter_array:
-        name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet = row.values()
-        
-        values = list(row.values())
+        name, team, division, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet = row.values()
 
-        print("BEFORE:")
-        print (row)
-        print (name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet)
+        sex, equipped, age_div = deconstruct_division(division)
+        print (sex, equipped, age_div)
+        #returning "sex equipment age_group", not the specifics
 
-        # These cells may be blank in the CSV.
-        # This uses the get method to default to None in that case.
-        team = row.get('Team')
-        squat1 = row.get('Squat 1')
-        squat2 = row.get('Squat 2')
-        squat3 = row.get('Squat 3')
-        bench1 = row.get('Bench 1')
-        bench2 = row.get('Bench 2')
-        bench3 = row.get('Bench 3')
-        deadlift1 = row.get('Deadlift 1')
-        deadlift2 = row.get('Deadlift 2')
-        deadlift3 = row.get('Deadlift 3')
-
-        print("AFTER:")
-        print (row)
-        print (name, team, div, bodyweight_kg, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_test, meet)
-
-
-        sex, equipped, age_div = deconstruct_division(div)
-        total_kg = calculate_total(row)
+        total_kg = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
         lifter = get_or_create_lifter(member_id, name)
         division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
         points = calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg)
+
 
         # Store processed data
         processed_lifter_data.append(
@@ -125,7 +107,9 @@ def make_lifter_array(f, meet):
         lifter_dict = {}
         for i, value in enumerate(row):
             header = headers[i]
-            if header == 'Bwt - kg' or header in ['Squat 1', 'Squat 2', 'Squat 3', 'Bench 1', 'Bench 2', 'Bench 3', 'Deadlift 1', 'Deadlift 2', 'Deadlift 3']:
+            if header == 'DOB':
+                lifter_dict[header] = datetime.strptime(value, "%m/%d/%Y").date() if value else None
+            elif header == 'Bwt - kg' or header in ['Squat 1', 'Squat 2', 'Squat 3', 'Bench 1', 'Bench 2', 'Bench 3', 'Deadlift 1', 'Deadlift 2', 'Deadlift 3']:
                 lifter_dict[header] = float(value) if value else None
             else:
                 lifter_dict[header] = value
@@ -147,6 +131,7 @@ def get_or_create_lifter(member_id, name):
 # Takes the division apart for easier comparison where needed, e.g., age group and birthdate comparison.
 def deconstruct_division(division):
     # Initialize the dictionary to store the components
+    # print ("DIVISION:", division)
     components = {}
 
     # Check first letter of division. If M, sex = male. If F, sex = female.
@@ -171,16 +156,15 @@ def deconstruct_division(division):
             f"Invalid division {division}. Must contain '-' followed by age group."
         )
 
+    print ("COMPONENTS", components)
     return components
 
 
 # Adds best squat, bench, and deadlift together to calculate a lifter's total.
-def calculate_total(row):
-    squat_attempts = [row["squat1"], row["squat2"], row["squat3"]]
-    bench_attempts = [row["bench1"], row["bench2"], row["bench3"]]
-    deadlift_attempts = [row["deadlift1"], row["deadlift2"], row["deadlift3"],]
-
-    
+def calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3):
+    squat_attempts = [squat1, squat2, squat3]
+    bench_attempts = [bench1, bench2, bench3]
+    deadlift_attempts = [deadlift1, deadlift2, deadlift3]
 
     # Filters out unsuccessful attempts, which are negative numbers in the CSV
     successful_squats = [attempt for attempt in squat_attempts if attempt is not None and attempt >= 0]
@@ -201,7 +185,7 @@ def calculate_total(row):
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
 def compare_dob_and_division(date_of_birth, division, meet_date):
-    _, age_div = deconstruct_division(division)
+    _, _, age_div = deconstruct_division(division)
 
     # Calculates the lifter's age
     age_at_meet = meet_date.year - date_of_birth.year
@@ -209,6 +193,9 @@ def compare_dob_and_division(date_of_birth, division, meet_date):
     # Define the age groups with the minimum age for each
     age_groups = {"JR": 19, "M1": 40, "M2": 50, "M3": 60, "M4": 70, "M5": 80}
 
+    # Avoids error on last if check
+    correct_age_div = "O"
+    
     # Check each age group in descending order
     for age_group in sorted(age_groups.keys(), key=age_groups.get, reverse=True):
         # Sorts the keys based on their values in the age_groups dictionary
@@ -286,6 +273,7 @@ def calculate_placing(lifter_data):
 
 # Calculates IPF GoodLift points
 def calculate_points(sex, equipped, discipline, total_kg, bodyweight_kg):
+    print ("POINTS VARIABLES:", [sex], equipped, discipline, total_kg, bodyweight_kg )
     # Defines the coefficients for the points calculation
     COEFFICIENTS = {
         "male": {
