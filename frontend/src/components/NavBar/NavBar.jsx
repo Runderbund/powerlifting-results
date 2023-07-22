@@ -21,7 +21,7 @@ const Navbar = () => {
           </Link>
         </li>
         <li className={styles.brand}>
-          <Link to="/meetresults">
+          <Link to="/meetlist">
             <b>Meet Results</b>
           </Link>
         </li>

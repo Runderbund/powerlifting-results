@@ -362,8 +362,9 @@ def upload_success():
 
 
 def list_lifters(request):
-    lifters = Lifter.objects.all().values('member_id', 'name')
+    lifters = Lifter.objects.all().order_by('name').values('member_id', 'name')
     return JsonResponse({'lifters': list(lifters)})
+
 
 def lifter_detail(request, lifter_id):
     lifter = Lifter.objects.filter(member_id=lifter_id).values()
