@@ -28,9 +28,9 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/lifterlist" element={<LifterListPage />} />
-        <Route path="/lifter" element={<LifterPage />} />
-        <Route path="/meetresults" element={<MeetResultsPage />} />
+        <Route path="/lifter/:id" element={<LifterPage />} />
         <Route path="/meetlist" element={<MeetListPage />} />
+        <Route path="/meetresults" element={<MeetResultsPage />} />
         <Route path="/unitconversion" element={<UnitConversionPage />} />
         <Route
           path="/upload"

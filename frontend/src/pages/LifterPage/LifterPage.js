@@ -1,36 +1,70 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import styles from "./LifterPage.module.css";
+import { Link, useParams } from "react-router-dom";
 
 const LifterPage = () => {
-  const { lifterId } = useParams();
-  const [lifter, setLifter] = useState(null);
-  const [results, setResults] = useState([]);
+  const { id } = useParams();
+  const [lifterData, setLifterData] = useState(null);
 
   useEffect(() => {
-    const fetchLifterAndResults = async () => {
-      const response = await axios.get(`http://localhost:8000/meets/lifters/${lifterId}`);
-      setLifter(response.data.lifter[0]);
-      setResults(response.data.results);
+    const fetchLifterData = async () => {
+      const response = await axios.get(`http://localhost:8000/meets/lifters/${id}`);
+      setLifterData(response.data);
     };
-    fetchLifterAndResults();
-  }, [lifterId]);
+    fetchLifterData();
+  }, [id]);
 
-  if (!lifter) {
+  if (!lifterData) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className={styles.lifterContainer}>
-      <h1>{lifter.name}</h1>
-      {results.map((result) => (
-        <div key={result.result_id} className={styles.result}>
-          <div>Meet ID: {result.meet}</div>
-          <div>Division: {result.division}</div>
-          <div>Total: {result.total}</div>
-        </div>
-      ))}
+    <div>
+      <h1>{lifterData.lifter[0].name}</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Competition</th>
+            <th>Date</th>
+            <th>Placing</th>
+            <th>Division</th>
+            <th>Bodyweight</th>
+            <th>Squat 1</th>
+            <th>Squat 2</th>
+            <th>Squat 3</th>
+            <th>Bench 1</th>
+            <th>Bench 2</th>
+            <th>Bench 3</th>
+            <th>Deadlift 1</th>
+            <th>Deadlift 2</th>
+            <th>Deadlift 3</th>
+            <th>Total</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lifterData.results.map((result) => (
+            <tr key={result.result_id}>
+              <td><Link to={`/meet/${result.meet}`}>{result.meet}</Link></td>
+              <td>{/* Fetch meet date  */}</td>
+              <td>{result.placing}</td>
+              <td>{result.division}</td>
+              <td>{result.bodyweight}</td>
+              <td>{result.squat1}</td>
+              <td>{result.squat2}</td>
+              <td>{result.squat3}</td>
+              <td>{result.bench1}</td>
+              <td>{result.bench2}</td>
+              <td>{result.bench3}</td>
+              <td>{result.deadlift1}</td>
+              <td>{result.deadlift2}</td>
+              <td>{result.deadlift3}</td>
+              <td>{result.total}</td>
+              <td>{result.points}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
