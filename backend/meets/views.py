@@ -204,6 +204,7 @@ def compare_dob_and_division(date_of_birth, division, meet_date):
         division = division.replace(age_div, correct_age_div)
 
     # TODO: Add logging
+    # TODO: Handle Subjunior and below
 
     return division
 
@@ -290,7 +291,7 @@ def calculate_points(sex, equipped, discipline, total, bodyweight):
     coefficients = COEFFICIENTS[sex][f"{equipped} {discipline}"]
     A, B, C = coefficients
 
-    points = 100 / (A - B * (math.exp(-C * bodyweight))) * total
+    points = round(100 / (A - B * (math.exp(-C * bodyweight))) * total, 2)
 
     return points
 

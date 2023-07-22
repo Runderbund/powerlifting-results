@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
+import styles from './LifterPage.module.css';
 
 const LifterPage = () => {
   const { id } = useParams();
@@ -8,7 +9,7 @@ const LifterPage = () => {
 
   useEffect(() => {
     const fetchLifterData = async () => {
-      const response = await axios.get(`http://localhost:8000/meets/lifters/${id}`);
+      const response = await axios.get(`http://localhost:8000/meets/lifters/${id}/`);
       setLifterData(response.data);
     };
     fetchLifterData();
@@ -19,9 +20,9 @@ const LifterPage = () => {
   }
 
   return (
-    <div>
+    <div className={styles.lifterContainer}>
       <h1>{lifterData.lifter[0].name}</h1>
-      <table>
+      <table className={styles.result}>
         <thead>
           <tr>
             <th>Competition</th>
@@ -45,8 +46,8 @@ const LifterPage = () => {
         <tbody>
           {lifterData.results.map((result) => (
             <tr key={result.result_id}>
-              <td><Link to={`/meet/${result.meet}`}>{result.meet}</Link></td>
-              <td>{/* Fetch meet date  */}</td>
+              <td><Link to={`/meet/${result.meet__meet_name}`}>{result.meet__meet_name}</Link></td>
+              <td>{result.meet__meet_date}</td>
               <td>{result.placing}</td>
               <td>{result.division}</td>
               <td>{result.bodyweight}</td>
