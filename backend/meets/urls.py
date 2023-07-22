@@ -8,5 +8,5 @@ urlpatterns = [
     path('lifters/', list_lifters, name='list_lifters'),
     path('lifters/<int:lifter_id>/', lifter_detail, name='lifter_detail'),
     path('meets/', list_meets, name='list_meets'),
-    path('meets/<int:meet_id>/results/', meet_results, name='meet_results'),
+    path('<int:meet_id>/results/', meet_results, name='meet_results'),
 ]

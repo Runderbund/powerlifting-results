@@ -46,7 +46,7 @@ const LifterPage = () => {
         <tbody>
           {lifterData.results.map((result) => (
             <tr key={result.result_id}>
-              <td><Link to={`/meet/${result.meet__meet_name}`}>{result.meet__meet_name}</Link></td>
+              <td><Link to={`/meet/${result.meet_id}`}>{result.meet__meet_name}</Link></td>
               <td>{result.meet__meet_date}</td>
               <td>{result.placing}</td>
               <td>{result.division}</td>

@@ -1,0 +1,40 @@
+.lifterContainer {
+  align-items: flex-start;
+  padding-top: 10vh;
+  margin: 0 auto;
+  overflow: auto;
+  text-align: center;
+  min-height: 90vh;
+  background-color: burlywood;
+  font-family: Arial, sans-serif;
+}
+
+.result {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1em;
+  background-color: rgb(49, 113, 170);
+  padding: 1em;
+  border-radius: 1em;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+  color: white;
+  margin-bottom: 1em;
+  font-size: 0.9em;
+}
+
+.result table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.result th, .result td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 6.25%;
+  padding: 0.5em;
+}

@@ -30,7 +30,7 @@ function App() {
         <Route path="/lifterlist" element={<LifterListPage />} />
         <Route path="/lifter/:id" element={<LifterPage />} />
         <Route path="/meetlist" element={<MeetListPage />} />
-        <Route path="/meetresults" element={<MeetResultsPage />} />
+        <Route path="/meet/:id" element={<MeetResultsPage />} />
         <Route path="/unitconversion" element={<UnitConversionPage />} />
         <Route
           path="/upload"

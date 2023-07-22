@@ -388,7 +388,13 @@ def list_meets(request):
 #     results = Result.objects.filter(meet__meet_id=meet_id).values()
 #     return JsonResponse({'meet': list(meet), 'results': list(results)})
 
+# def meet_results(request, meet_id):
+#     meet = Meet.objects.get(pk=meet_id)
+#     results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
+#     return JsonResponse({'meet': meet, 'results': list(results)})
+
 def meet_results(request, meet_id):
     meet = Meet.objects.get(pk=meet_id)
     results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
-    return JsonResponse({'meet': meet, 'results': list(results)})
+    meet_data = {'meet_name': meet.meet_name, 'meet_date': meet.meet_date}  # Adjust this line to match your actual Meet model's fields.
+    return JsonResponse({'meet': meet_data, 'results': list(results)})
