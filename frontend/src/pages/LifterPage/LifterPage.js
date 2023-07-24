@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
-import styles from './LifterPage.module.css';
+import styles from "./LifterPage.module.css";
 
 const LifterPage = () => {
   const { id } = useParams();
@@ -9,7 +9,9 @@ const LifterPage = () => {
 
   useEffect(() => {
     const fetchLifterData = async () => {
-      const response = await axios.get(`http://localhost:8000/meets/lifters/${id}/`);
+      const response = await axios.get(
+        `http://localhost:8000/meets/lifters/${id}/`
+      );
       setLifterData(response.data);
     };
     fetchLifterData();
@@ -46,7 +48,11 @@ const LifterPage = () => {
         <tbody>
           {lifterData.results.map((result) => (
             <tr key={result.result_id}>
-              <td><Link to={`/meet/${result.meet_id}`}>{result.meet__meet_name}</Link></td>
+              <td>
+                <Link to={`/meet/${result.meet__meet_id}`}>
+                  {result.meet__meet_name}
+                </Link>
+              </td>
               <td>{result.meet__meet_date}</td>
               <td>{result.placing}</td>
               <td>{result.division}</td>

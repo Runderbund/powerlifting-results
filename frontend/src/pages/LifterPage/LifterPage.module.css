@@ -38,3 +38,10 @@
   width: 6.25%;
   padding: 0.5em;
 }
+
+.meetLink {
+  margin: 10px 0;
+  color: white;
+  text-decoration: underline;
+  font-size: 1.2em;
+}
