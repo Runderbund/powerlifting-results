@@ -17,6 +17,10 @@ const LifterPage = () => {
     fetchLifterData();
   }, [id]);
 
+  const getLiftStyle = (lift) => {
+    return lift >= 0 ? styles.successfulLift : styles.failedLift;
+  };
+
   if (!lifterData) {
     return <div>Loading...</div>;
   }
@@ -46,10 +50,10 @@ const LifterPage = () => {
           </tr>
         </thead>
         <tbody>
-          {lifterData.results.map((result) => (
+          {lifterData.results.map((result, index) => (
             <tr key={result.result_id}>
               <td>
-                <Link to={`/meet/${result.meet__meet_id}`}>
+                <Link className={styles.meetLink} to={`/meet/${result.meet__meet_id}`}>
                   {result.meet__meet_name}
                 </Link>
               </td>
@@ -57,15 +61,15 @@ const LifterPage = () => {
               <td>{result.placing}</td>
               <td>{result.division}</td>
               <td>{result.bodyweight}</td>
-              <td>{result.squat1}</td>
-              <td>{result.squat2}</td>
-              <td>{result.squat3}</td>
-              <td>{result.bench1}</td>
-              <td>{result.bench2}</td>
-              <td>{result.bench3}</td>
-              <td>{result.deadlift1}</td>
-              <td>{result.deadlift2}</td>
-              <td>{result.deadlift3}</td>
+              <td className={getLiftStyle(result.squat1)}>{result.squat1}</td>
+              <td className={getLiftStyle(result.squat2)}>{result.squat2}</td>
+              <td className={getLiftStyle(result.squat3)}>{result.squat3}</td>
+              <td className={getLiftStyle(result.bench1)}>{result.bench1}</td>
+              <td className={getLiftStyle(result.bench2)}>{result.bench2}</td>
+              <td className={getLiftStyle(result.bench3)}>{result.bench3}</td>
+              <td className={getLiftStyle(result.deadlift1)}>{result.deadlift1}</td>
+              <td className={getLiftStyle(result.deadlift2)}>{result.deadlift2}</td>
+              <td className={getLiftStyle(result.deadlift3)}>{result.deadlift3}</td>
               <td>{result.total}</td>
               <td>{result.points}</td>
             </tr>

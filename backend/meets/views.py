@@ -319,7 +319,7 @@ def list_lifters(request):
 
 def lifter_detail(request, lifter_id):
     lifter = Lifter.objects.filter(member_id=lifter_id).values()
-    results = Result.objects.filter(lifter__member_id=lifter_id).values('meet__meet_id', 'meet__meet_name', 'meet__meet_date', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
+    results = Result.objects.filter(lifter__member_id=lifter_id).values('meet__meet_id', 'meet__meet_name', 'meet__meet_date', 'placing', 'division', 'bodyweight', 'weight_class', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
     return JsonResponse({'lifter': list(lifter), 'results': list(results)})
 
 
@@ -331,7 +331,7 @@ def list_meets(request):
 
 def meet_results(request, meet_id):
     meet = Meet.objects.get(pk=meet_id)
-    results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
+    results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'weight_class', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
     meet_data = {'meet_name': meet.meet_name, 'meet_date': meet.meet_date}
     return JsonResponse({'meet': meet_data, 'results': list(results)})
 
