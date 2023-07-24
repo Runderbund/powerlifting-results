@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import UploadFileForm
 import csv
@@ -24,11 +25,13 @@ def upload_file(request):
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
         result_objects = handle_uploaded_file(request.FILES["resultsFile"], meet)
-        return HttpResponse("File uploaded successfully")
+        return JsonResponse({"message": "File uploaded successfully", "meetId": meet.meet_id})
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
     return render(request, "upload.html", {"form": form})
+
+
 
 
 
@@ -306,11 +309,50 @@ def log_changes():
     # Lifter [lifter name] set a new record in [division] [lift] with [lift weight] kg.
     pass
 
+# Writing all for now. Adjust to only neccessary fields later and put in order.
+# Check with Dad to see what he uploads.
+def download_meet_results(request, meet_id):
+    # Gets the results for the specified meet
+    results = Result.objects.filter(meet__meet_id=meet_id).values(
+        'lifter__name',  
+        'lifter__member_id', 
+        'team', 
+        'division',
+        'sex',
+        'equipment',
+        'age_group',
+        'bodyweight',
+        'weight_class',
+        'date_of_birth',
+        'lot',
+        'squat1',
+        'squat2',
+        'squat3',
+        'bench1',
+        'bench2',
+        'bench3',
+        'deadlift1',
+        'deadlift2',
+        'deadlift3',
+        'total',
+        'discipline',
+        'points',
+        'state',
+        'placing',
+        'drug_tested'
+    )
 
+    # Prepares the HttpResponse object with appropriate CSV headers.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="meet_results.csv"'
 
-def upload_success():
-    # If there is nothing that needs to be checked manually (e.g., dob in future), then this will just redirect to the next page, where changes will be displayed and the modified file will be available for download.
-    pass
+    # Writes the data to the response object
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Member ID', 'Team', 'Division', 'Sex', 'Equipment', 'Age Group', 'Bodyweight', 'Weight Class', 'Date of Birth', 'Lot', 'Squat1', 'Squat2', 'Squat3', 'Bench1', 'Bench2', 'Bench3', 'Deadlift1', 'Deadlift2', 'Deadlift3', 'Total', 'Discipline', 'Points', 'State', 'Placing', 'Drug Tested'])
+    for result in results:
+        writer.writerow(result.values())
+
+    return response
 
 
 def list_lifters(request):

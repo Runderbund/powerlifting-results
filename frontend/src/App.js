@@ -12,6 +12,7 @@ import MeetResultsPage from "./pages/MeetResultsPage/MeetResultsPage";
 import MeetListPage from "./pages/MeetListPage/MeetListPage";
 import ResultsUploadPage from "./pages/ResultsUploadPage/ResultsUploadPage";
 import UnitConversionPage from "./pages/UnitConversionPage/UnitConversionPage";
+import UploadSuccessPage from "./pages/UploadSuccessPage/UploadSuccessPage";
 
 // Component Imports
 import Navbar from "./components/NavBar/NavBar";
@@ -32,6 +33,7 @@ function App() {
         <Route path="/meetlist" element={<MeetListPage />} />
         <Route path="/meet/:id" element={<MeetResultsPage />} />
         <Route path="/unitconversion" element={<UnitConversionPage />} />
+        <Route path="/uploadsuccess" element={<UploadSuccessPage />} />
         <Route
           path="/upload"
           element={

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./ResultsUploadPage.module.css";
+import { useNavigate } from "react-router-dom";
 
 const ResultsUploadPage = () => {
-  const [results, setResults] = useState([]);
+  const [meetId, setMeetId] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -21,7 +23,9 @@ const ResultsUploadPage = () => {
       })
       .then((response) => {
         console.log("File uploaded successfully");
-        setResults(response.data);
+        // Update the meet ID state variable
+        setMeetId(response.data.meetId);
+        navigate("/uploadsuccess", { state: { meetId: response.data.meetId } });
       })
       .catch((error) => {
         console.log("File upload failed");
@@ -52,6 +56,3 @@ const ResultsUploadPage = () => {
 };
 
 export default ResultsUploadPage;
-
-
-// TODO: Add drag and drop capability with react-dropzone
