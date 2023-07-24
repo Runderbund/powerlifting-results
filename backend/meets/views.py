@@ -299,6 +299,7 @@ def calculate_points(sex, equipped, discipline, total, bodyweight):
 
 
 def log_changes():
+    changes = []
     # Every time a change is made, log it to a file.
     # For lifter [lifter name], age group did not match with date of birth. Adjusted age group from [age group] to [age group].
     # For lifter [lifter name], weight class did not match with bodyweight. Adjusted weight class from [weight class] to [weight class].
@@ -331,7 +332,7 @@ def list_meets(request):
 
 def meet_results(request, meet_id):
     meet = Meet.objects.get(pk=meet_id)
-    results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'weight_class', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
+    results = meet.result_set.values('lifter__name',  'lifter__member_id', 'placing', 'division', 'bodyweight', 'weight_class', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
     meet_data = {'meet_name': meet.meet_name, 'meet_date': meet.meet_date}
     return JsonResponse({'meet': meet_data, 'results': list(results)})
 

@@ -38,10 +38,10 @@ const MeetResultsPage = () => {
       <table className={styles.result}>
         <thead>
           <tr>
+            <th>Lifter</th>
             <th>Division</th>
             <th>Weight Class</th>
             <th>Placing</th>
-
             <th>Bodyweight</th>
             <th>Squat 1</th>
             <th>Squat 2</th>
@@ -59,6 +59,9 @@ const MeetResultsPage = () => {
         <tbody>
           {meetData.results.map((result) => (
             <tr key={result.result_id}>
+              <Link className={styles.lifterLink} to={`/lifter/${result.lifter__member_id}`}>
+                  {result.lifter__name}
+                </Link>
               <td>{result.division}</td>
               <td>{result.weight_class}</td>
               <td>{result.placing}</td>

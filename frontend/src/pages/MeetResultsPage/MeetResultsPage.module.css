@@ -58,3 +58,11 @@
 .failedLift {
   background-color: red;
 }
+
+.lifterLink {
+  margin: 10px 0;
+  color: white;
+  text-decoration: underline;
+  font-size: 1.2em;
+  /* Figure out padding on left */
+}

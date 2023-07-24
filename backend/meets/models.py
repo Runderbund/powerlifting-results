@@ -69,6 +69,7 @@ class Meet(models.Model):
     # Name and date come from textboxes outside of CSV (for now).
     # Eventually State/Location and Sanction #, not important for now.
 
+# Not currently used
 class Record(models.Model):
     division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
     discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
