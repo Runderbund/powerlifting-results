@@ -3,15 +3,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .forms import UploadFileForm
 import csv
 from .models import Lifter, Meet, Result
-import pandas as pd  # Learn more about pandas
+import pandas as pd
 import math
 import io
-# from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
 from django.http import JsonResponse
 from .models import Lifter, Meet, Result
-
+# from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 # @permission_classes([IsAuthenticated])
@@ -299,61 +298,12 @@ def calculate_points(sex, equipped, discipline, total, bodyweight):
 # TODO: Add Dl/PP events
 
 
-def check_for_new_records():
-    # Compare to matching division and lift in Records. Update if higher.
-    # Should check after each lift, technically, since records can be gained and lost to the next lifter prior to meet ending, and the lifter still gets credit for setting it.
-    # Start by comparing largest in division, check in depth later.
-    pass
-
-
-def compare_name_and_member_id():
-    # Check whether the name matches the member_id. If not, add to a log of errors and  send back to upload page.
-    pass
-
-
 def log_changes():
     # Every time a change is made, log it to a file.
     # For lifter [lifter name], age group did not match with date of birth. Adjusted age group from [age group] to [age group].
     # For lifter [lifter name], weight class did not match with bodyweight. Adjusted weight class from [weight class] to [weight class].
     # Lifter [lifter name] set a new record in [division] [lift] with [lift weight] kg.
     pass
-
-
-#  Not needed with for snippet at bottom of handle_uploaded_file
-# def create_result_objects(processed_lifter_data, meet):
-#     result_objects = []
-#     for data in processed_lifter_data:
-#         result = Result(
-#             meet=data["meet"],
-#             lifter=data["lifter"],
-#             team=data["team"],
-#             division=data["division"],
-#             bodyweight=data["bodyweight"],
-#             weight_class=data["weight_class"],
-#             date_of_birth=data["date_of_birth"],
-#             lot=data["lot"],
-#             squat1=data.get("squat1"),
-#             squat2=data.get("squat2"),
-#             squat3=data.get("squat3"),
-#             bench1=data.get("bench1"),
-#             bench2=data.get("bench2"),
-#             bench3=data.get("bench3"),
-#             deadlift1=data.get("deadlift1"),
-#             deadlift2=data.get("deadlift2"),
-#             deadlift3=data.get("deadlift3"),
-#             total=data["total"],
-#             discipline=data["discipline"],
-#             state=data["state"],
-#             member_id=data["member_id"],
-#             drug_test=data["drug_test"],
-#             sex=data["sex"],
-#             equipment=data["equipment"],
-#             age_group=data["age_group"],
-#             points=data["points"],
-#         )
-#         result.save()
-#         result_objects.append(result)
-#     return result_objects
 
 
 
@@ -367,11 +317,6 @@ def list_lifters(request):
     return JsonResponse({'lifters': list(lifters)})
 
 
-# def lifter_detail(request, lifter_id):
-#     lifter = Lifter.objects.filter(member_id=lifter_id).values()
-#     results = Result.objects.filter(lifter__member_id=lifter_id).values()
-#     return JsonResponse({'lifter': list(lifter), 'results': list(results)})
-
 def lifter_detail(request, lifter_id):
     lifter = Lifter.objects.filter(member_id=lifter_id).values()
     results = Result.objects.filter(lifter__member_id=lifter_id).values('meet__meet_id', 'meet__meet_name', 'meet__meet_date', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
@@ -383,18 +328,25 @@ def list_meets(request):
     meets = Meet.objects.all().values('meet_id', 'meet_name')
     return JsonResponse({'meets': list(meets)})
 
-# def meet_results(request, meet_id):
-#     meet = Meet.objects.filter(meet_id=meet_id).values()
-#     results = Result.objects.filter(meet__meet_id=meet_id).values()
-#     return JsonResponse({'meet': list(meet), 'results': list(results)})
-
-# def meet_results(request, meet_id):
-#     meet = Meet.objects.get(pk=meet_id)
-#     results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
-#     return JsonResponse({'meet': meet, 'results': list(results)})
 
 def meet_results(request, meet_id):
     meet = Meet.objects.get(pk=meet_id)
     results = meet.result_set.values('lifter__name', 'placing', 'division', 'bodyweight', 'squat1', 'squat2', 'squat3', 'bench1', 'bench2', 'bench3', 'deadlift1', 'deadlift2', 'deadlift3', 'total', 'points')
-    meet_data = {'meet_name': meet.meet_name, 'meet_date': meet.meet_date}  # Adjust this line to match your actual Meet model's fields.
+    meet_data = {'meet_name': meet.meet_name, 'meet_date': meet.meet_date}
     return JsonResponse({'meet': meet_data, 'results': list(results)})
+
+
+
+
+
+# TODO: Additional checks to add once connecting to actual Powerlifting America database
+def check_for_new_records():
+    # Compare to matching division and lift in Records. Update if higher.
+    # Should check after each lift, technically, since records can be gained and lost to the next lifter prior to meet ending, and the lifter still gets credit for setting it.
+    # Start by comparing largest in division, check in depth later.
+    pass
+
+
+def compare_name_and_member_id():
+    # Check whether the name matches the member_id. If not, add to a log of errors and  send back to upload page.
+    pass
