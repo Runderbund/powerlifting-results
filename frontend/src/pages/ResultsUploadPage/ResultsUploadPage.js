@@ -23,14 +23,13 @@ const ResultsUploadPage = () => {
       })
       .then((response) => {
         console.log("File uploaded successfully");
-        // Update the meet ID state variable
         setMeetId(response.data.meetId);
-        navigate("/uploadsuccess", { state: { meetId: response.data.meetId } });
+        navigate("/uploadsuccess", { state: { meetId: response.data.meetId, changeLog: response.data.changeLog } });
       })
       .catch((error) => {
         console.log("File upload failed");
         console.log(error);
-      });
+  });
   };
 
   return (

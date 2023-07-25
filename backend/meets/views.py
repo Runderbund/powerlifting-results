@@ -25,7 +25,7 @@ def upload_file(request):
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
         change_log = handle_uploaded_file(request.FILES["resultsFile"], meet)
-        return JsonResponse({"message": "File uploaded successfully", "meetId": meet.meet_id})
+        return JsonResponse({"message": "File uploaded successfully", "meetId": meet.meet_id, "changeLog": change_log})
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
@@ -44,14 +44,15 @@ def handle_uploaded_file(f, meet):
     for row in lifter_array:
         name, team, division, bodyweight, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_tested, meet = row.values()
 
+        total = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
+        lifter = get_or_create_lifter(member_id, name)
+        division, age_change = compare_dob_and_division(name, date_of_birth, division, meet.meet_date)
+
         division_components = deconstruct_division(division)
         sex = division_components['sex']
         equipment = division_components['equipment']
         age_group = division_components['age_group']
-
-        total = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
-        lifter = get_or_create_lifter(member_id, name)
-        division, age_change = compare_dob_and_division(name, date_of_birth, division, meet.meet_date)
+        
         weight_class, weight_change = compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight)
         points = calculate_points(sex, equipment, discipline, total, bodyweight)
 
@@ -189,37 +190,48 @@ def calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, d
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
-    _, _, age_div = deconstruct_division(division)
+    division_components = deconstruct_division(division)
+    age_div = division_components['age_group']
+
     age_changes = []
 
     # Calculates the lifter's age
     age_at_meet = meet_date.year - date_of_birth.year
 
-    # Define the age groups with the minimum age for each
-    age_groups = {"JR": 19, "M1": 40, "M2": 50, "M3": 60, "M4": 70, "M5": 80}
+    # Define the age groups with the minimum and maximum age for each
+    age_groups = {
+        "SJ": {"min": 14, "max": 18},
+        "J": {"min": 19, "max": 23}, 
+        "M1": {"min": 40, "max": 49}, 
+        "M2": {"min": 50, "max": 59}, 
+        "M3": {"min": 60, "max": 69}, 
+        "M4": {"min": 70, "max": float('inf')},  # No upper limit for M4
+    }
 
-    # Avoids error on last if check
+    # If the lifter's division is "O", returns the original division and an empty change list
+    if age_div == "O":
+        return division, []
+
     correct_age_div = "O"
-    
-    # Check each age group in descending order
-    for age_group in sorted(age_groups.keys(), key=age_groups.get, reverse=True):
-        # Sorts the keys based on their values in the age_groups dictionary
-        if age_at_meet >= age_groups[age_group]:
+
+    for age_group, age_range in age_groups.items():
+        # If the lifter's age is within the current age group's range
+        if age_range["min"] <= age_at_meet < age_range["max"]:
+            # Sets the correct age division to the current age group
             correct_age_div = age_group
             break
 
-    # If the lifter's division doesn't match their age, return the corrected division
-    if age_div != "O" and age_div != correct_age_div:
+    # If the lifter's division doesn't match the correct age division, returns the corrected division
+    if age_div != correct_age_div:
         age_changes = [name, age_div, correct_age_div]
         division = division.replace(age_div, correct_age_div)
     else:
         age_changes = []
     return division, age_changes
 
-    # TODO: Add logging
-    # TODO: Handle Subjunior and below
 
-    return division, age_changes
+
+    # TODO: Handle Subjunior and below
 
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
@@ -317,19 +329,29 @@ def calculate_points(sex, equipped, discipline, total, bodyweight):
 def log_changes(age_div_changes, weight_class_changes):
     change_log = []
 
-    # Log the changes related to the age division
+    # Logs the changes related to the age division
     for change in age_div_changes:
         if change:  # Ignore empty arrays
             lifter_name, original_age_div, correct_age_div = change
             change_log.append(f"For lifter {lifter_name}, age group did not match with date of birth. Adjusted age group from {original_age_div} to {correct_age_div}.")
 
-    # Log the changes related to the weight class
+    # Logs the changes related to the weight class
     for change in weight_class_changes:
         if change:
             lifter_name, original_weight_class, correct_weight_class = change
             change_log.append(f"For lifter {lifter_name}, weight class did not match with bodyweight. Adjusted weight class from {original_weight_class} to {correct_weight_class}.")
 
+    # Checks if any changes were made
+    if len(change_log) > 0:
+        # Start of the message
+        change_log.insert(0, "The following changes were made to the results that were provided.\n")
+        # End of the message
+        change_log.append("\nPlease see the attached Excel sheet.")
+    else:
+        change_log.append("There were no changes to the provided data. All age groups matched birth dates and all weight classes matched bodyweight.")
+    
     return change_log
+
 
 
 
