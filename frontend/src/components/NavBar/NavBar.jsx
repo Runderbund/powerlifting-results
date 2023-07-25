@@ -38,7 +38,7 @@ const Navbar = () => {
           </li>
         )}
 
-        <li>
+        <li className={styles.brand}>
           {user ? (
             <button onClick={logoutUser}>Logout</button>
           ) : (
