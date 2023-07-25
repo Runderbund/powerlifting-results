@@ -229,50 +229,53 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
         age_changes = []
     return division, age_changes
 
-
-
-    # TODO: Handle Subjunior and below
-
+# TODO: Handle Youth Lifters. Different rules.
+# TODO: Handle SJ by full date, not year.
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
 def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
     WEIGHT_CLASSES = {
         "female": {
-            43.0: "43",
-            47.0: "47",
-            52.0: "52",
-            57.0: "57",
-            63.0: "63",
-            69.0: "69",
-            76.0: "76",
-            84.0: "84",
-            float("inf"): "84+",
+            "43": {"min": 0, "max": 43},
+            "47": {"min": 43.1, "max": 47},
+            "52": {"min": 47.1, "max": 52},
+            "57": {"min": 52.1, "max": 57},
+            "63": {"min": 57.1, "max": 63},
+            "69": {"min": 63.1, "max": 69},
+            "76": {"min": 69.1, "max": 76},
+            "84": {"min": 76.1, "max": 84},
+            "84+": {"min": 84.1, "max": float('inf')},
         },
         "male": {
-            53.0: "53",
-            59.0: "59",
-            66.0: "66",
-            74.0: "74",
-            83.0: "83",
-            93.0: "93",
-            105.0: "105",
-            120.0: "120",
-            float("inf"): "120+",
+            "53": {"min": 0, "max": 53},
+            "59": {"min": 53.1, "max": 59},
+            "66": {"min": 59.1, "max": 66},
+            "74": {"min": 66.1, "max": 74},
+            "83": {"min": 74.1, "max": 83},
+            "93": {"min": 83.1, "max": 93},
+            "105": {"min": 93.1, "max": 105},
+            "120": {"min": 105.1, "max": 120},
+            "120+": {"min": 120.1, "max": float('inf')},
         },
     }
 
     weight_changes = []
 
-    for threshold in sorted(WEIGHT_CLASSES[sex]):
-        if bodyweight <= threshold:
-            correct_weight_class = WEIGHT_CLASSES[sex][threshold]
+    correct_weight_class = "120+" if sex == "male" else "84+"
+
+    for weight_class_key, weight_range in WEIGHT_CLASSES[sex].items():
+        # If the lifter's bodyweight is within the current weight class's range
+        if weight_range["min"] <= bodyweight <= weight_range["max"]:
+            # Sets the correct weight class to the current weight class
+            correct_weight_class = weight_class_key
             break
 
     if weight_class != correct_weight_class:
         weight_changes = [name, weight_class, correct_weight_class]
-    else:
-        weight_changes = []
+        weight_class = correct_weight_class
+
     return weight_class, weight_changes
+
 
 
 # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
