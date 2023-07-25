@@ -24,15 +24,12 @@ def upload_file(request):
         meet_name = form.cleaned_data.get('meetName')
         meet_date = form.cleaned_data.get('meetDate')
         meet = Meet.objects.create(meet_name=meet_name, meet_date=meet_date)
-        result_objects = handle_uploaded_file(request.FILES["resultsFile"], meet)
+        change_log = handle_uploaded_file(request.FILES["resultsFile"], meet)
         return JsonResponse({"message": "File uploaded successfully", "meetId": meet.meet_id})
     else:
         form = UploadFileForm()
         # Stay on same page, print out errors below.
     return render(request, "upload.html", {"form": form})
-
-
-
 
 
 # Runs through each lifter in the CSV file and resolves conflicts.
@@ -41,6 +38,8 @@ def upload_file(request):
 def handle_uploaded_file(f, meet):
     lifter_array = make_lifter_array(f, meet)
     processed_lifter_data = []
+    age_div_changes = []
+    weight_class_changes = []
 
     for row in lifter_array:
         name, team, division, bodyweight, weight_class, date_of_birth, lot, squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3, discipline, state, member_id, drug_tested, meet = row.values()
@@ -52,8 +51,15 @@ def handle_uploaded_file(f, meet):
 
         total = calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, deadlift2, deadlift3)
         lifter = get_or_create_lifter(member_id, name)
-        division = compare_dob_and_division(date_of_birth, division, meet.meet_date)
+        division, age_change = compare_dob_and_division(name, date_of_birth, division, meet.meet_date)
+        weight_class, weight_change = compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight)
         points = calculate_points(sex, equipment, discipline, total, bodyweight)
+
+        if len(age_change) == 3:
+            age_div_changes.append(age_change)
+        if len(weight_change) == 3:
+            weight_class_changes.append(weight_change)
+
 
         processed_lifter_data.append(
             {
@@ -90,9 +96,9 @@ def handle_uploaded_file(f, meet):
     for lifter_data in processed_lifter_data:
         result = Result.objects.create(**lifter_data) # Unpacks the dictionary
         result_objects.append(result)
-        # Create Lifter, Meet, and Record objects
+    change_log = log_changes(age_div_changes, weight_class_changes)
 
-    return result_objects
+    return change_log
 
 
 
@@ -182,8 +188,9 @@ def calculate_total(squat1, squat2, squat3, bench1, bench2, bench3, deadlift1, d
 
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
-def compare_dob_and_division(date_of_birth, division, meet_date):
+def compare_dob_and_division(name, date_of_birth, division, meet_date):
     _, _, age_div = deconstruct_division(division)
+    age_changes = []
 
     # Calculates the lifter's age
     age_at_meet = meet_date.year - date_of_birth.year
@@ -203,18 +210,22 @@ def compare_dob_and_division(date_of_birth, division, meet_date):
 
     # If the lifter's division doesn't match their age, return the corrected division
     if age_div != "O" and age_div != correct_age_div:
+        age_changes = [name, age_div, correct_age_div]
         division = division.replace(age_div, correct_age_div)
+    else:
+        age_changes = []
+    return division, age_changes
 
     # TODO: Add logging
     # TODO: Handle Subjunior and below
 
-    return division
+    return division, age_changes
 
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
-def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
+def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
     WEIGHT_CLASSES = {
-        "W": {
+        "female": {
             43.0: "43",
             47.0: "47",
             52.0: "52",
@@ -225,7 +236,7 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
             84.0: "84",
             float("inf"): "84+",
         },
-        "M": {
+        "male": {
             53.0: "53",
             59.0: "59",
             66.0: "66",
@@ -238,16 +249,18 @@ def compare_bodyweight_and_weightclass(sex, weight_class, bodyweight_kg):
         },
     }
 
+    weight_changes = []
 
     for threshold in sorted(WEIGHT_CLASSES[sex]):
-        if bodyweight_kg <= threshold:
+        if bodyweight <= threshold:
             correct_weight_class = WEIGHT_CLASSES[sex][threshold]
             break
 
     if weight_class != correct_weight_class:
-        return correct_weight_class
+        weight_changes = [name, weight_class, correct_weight_class]
     else:
-        return weight_class
+        weight_changes = []
+    return weight_class, weight_changes
 
 
 # Compares the totals within each division (sex, age group, weight class) and assigns a placing (1st, 2nd, 3rd, etc.)
@@ -301,13 +314,24 @@ def calculate_points(sex, equipped, discipline, total, bodyweight):
 # TODO: Add Dl/PP events
 
 
-def log_changes():
-    changes = []
-    # Every time a change is made, log it to a file.
-    # For lifter [lifter name], age group did not match with date of birth. Adjusted age group from [age group] to [age group].
-    # For lifter [lifter name], weight class did not match with bodyweight. Adjusted weight class from [weight class] to [weight class].
-    # Lifter [lifter name] set a new record in [division] [lift] with [lift weight] kg.
-    pass
+def log_changes(age_div_changes, weight_class_changes):
+    change_log = []
+
+    # Log the changes related to the age division
+    for change in age_div_changes:
+        if change:  # Ignore empty arrays
+            lifter_name, original_age_div, correct_age_div = change
+            change_log.append(f"For lifter {lifter_name}, age group did not match with date of birth. Adjusted age group from {original_age_div} to {correct_age_div}.")
+
+    # Log the changes related to the weight class
+    for change in weight_class_changes:
+        if change:
+            lifter_name, original_weight_class, correct_weight_class = change
+            change_log.append(f"For lifter {lifter_name}, weight class did not match with bodyweight. Adjusted weight class from {original_weight_class} to {correct_weight_class}.")
+
+    return change_log
+
+
 
 # Writing all for now. Adjust to only neccessary fields later and put in order.
 # Check with Dad to see what he uploads.
