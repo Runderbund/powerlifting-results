@@ -16,8 +16,8 @@ const LifterListPage = () => {
 
   return (
     <div className={styles.lifterContainer}>
+      <h1>Lifters</h1>
       <div className={styles.lifterList}>
-        <h2>Lifters</h2>
         {lifters.map((lifter) => (
           <div key={lifter.member_id}>
             <Link className={styles.lifterLink} to={`/lifter/${lifter.member_id}`}>{lifter.name}</Link>

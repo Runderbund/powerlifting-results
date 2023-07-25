@@ -1,6 +1,5 @@
-.lifterContainer {
-  align-items: flex-start;
-  padding-top: 10vh;
+.container {
+  align-items: center;
   margin: 0 auto;
   overflow: auto;
   text-align: center;

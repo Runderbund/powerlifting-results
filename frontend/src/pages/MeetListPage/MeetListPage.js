@@ -16,8 +16,8 @@ const MeetListPage = () => {
 
   return (
     <div className={styles.meetContainer}>
+      <h1>Meets</h1>
       <div className={styles.meetList}>
-        <h2>Meets</h2>
         {meets.map((meet) => (
           <div key={meet.meet_id}>
             <Link className={styles.meetLink} to={`/meet/${meet.meet_id}`}>{meet.meet_name}</Link>

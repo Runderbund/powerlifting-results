@@ -7,9 +7,11 @@ Will lead to needless repetition, but clearer logic for me until the important s
   overflow: auto;
   text-align: center;
   min-height: 100vh;
+  padding-top: 5vh;
   background-color: burlywood;
+  font-family: Arial, sans-serif;
 }
 
 .logo {
-  max-width: 500px;
+  max-width: 800px;
 }
