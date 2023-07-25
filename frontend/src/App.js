@@ -1,5 +1,6 @@
 // General Imports
 import { Routes, Route } from "react-router-dom";
+import styles from "./App.module.css";
 
 // Pages Imports
 import HomePage from "./pages/HomePage/HomePage";
@@ -21,27 +22,29 @@ import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   return (
-    <div>
+    <div className={styles.appContainer}>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/lifterlist" element={<LifterListPage />} />
-        <Route path="/lifter/:id" element={<LifterPage />} />
-        <Route path="/meetlist" element={<MeetListPage />} />
-        <Route path="/meet/:id" element={<MeetResultsPage />} />
-        <Route path="/unitconversion" element={<UnitConversionPage />} />
-        <Route path="/uploadsuccess" element={<UploadSuccessPage />} />
-        <Route
-          path="/upload"
-          element={
-            <PrivateRoute>
-              <ResultsUploadPage />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
+      <div className={styles.routesContainer}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/lifterlist" element={<LifterListPage />} />
+          <Route path="/lifter/:id" element={<LifterPage />} />
+          <Route path="/meetlist" element={<MeetListPage />} />
+          <Route path="/meet/:id" element={<MeetResultsPage />} />
+          <Route path="/unitconversion" element={<UnitConversionPage />} />
+          <Route path="/uploadsuccess" element={<UploadSuccessPage />} />
+          <Route
+            path="/upload"
+            element={
+              <PrivateRoute>
+                <ResultsUploadPage />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
   margin: 0 auto;
   overflow: auto;
   text-align: center;
-  min-height: 90vh;
+  min-height: 91.5vh;
   background-color: burlywood;
   font-family: Arial, sans-serif;
 }
@@ -62,6 +62,5 @@
   margin: 10px 0;
   color: white;
   text-decoration: underline;
-  font-size: 1.2em;
-  /* Figure out padding on left */
+  font-size: 1em;
 }

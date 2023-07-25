@@ -9,6 +9,7 @@
     /* currently scrolling, thanks to NavBar */
     background-color: burlywood;
     font-family: Arial, sans-serif;
+    min-height: 86.5vh;
   }
   
   .conversionBox {

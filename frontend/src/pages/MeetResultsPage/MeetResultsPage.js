@@ -59,9 +59,11 @@ const MeetResultsPage = () => {
         <tbody>
           {meetData.results.map((result) => (
             <tr key={result.result_id}>
+              <td>
               <Link className={styles.lifterLink} to={`/lifter/${result.lifter__member_id}`}>
                   {result.lifter__name}
                 </Link>
+              </td>
               <td>{result.division}</td>
               <td>{result.weight_class}</td>
               <td>{result.placing}</td>
