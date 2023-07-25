@@ -68,3 +68,19 @@ button {
 button:hover {
   background-color: burlywood;
 }
+
+.dropzone {
+  border: 1px dashed gray;
+  padding: 20px;
+  background-color: rgba(200, 200, 200, 1);
+  cursor: pointer;
+  width: 90%;
+}
+
+.dropzoneActive {
+  border: 1px dashed gray;
+  padding: 20px;
+  background-color: rgba(200, 200, 200, 0.5);
+  cursor: pointer;
+  width: 90%;
+}

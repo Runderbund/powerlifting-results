@@ -342,14 +342,14 @@ def log_changes(age_div_changes, weight_class_changes):
     for change in weight_class_changes:
         if change:
             lifter_name, original_weight_class, correct_weight_class = change
-            change_log.append(f"For lifter {lifter_name}, weight class did not match with bodyweight. Adjusted weight class from {original_weight_class} to {correct_weight_class}.")
+            change_log.append(f"For lifter {lifter_name}, weight class did not match with bodyweight. Adjusted weight class from {original_weight_class} kg to {correct_weight_class} kg.")
 
     # Checks if any changes were made
     if len(change_log) > 0:
         # Start of the message
         change_log.insert(0, "The following changes were made to the results that were provided.\n")
         # End of the message
-        change_log.append("\nPlease see the attached Excel sheet.")
+        change_log.append("\nPlease see the attached CSV file.")
     else:
         change_log.append("There were no changes to the provided data. All age groups matched birth dates and all weight classes matched bodyweight.")
     
