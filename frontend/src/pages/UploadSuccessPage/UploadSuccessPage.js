@@ -13,15 +13,15 @@ const UploadSuccessPage = () => {
   return (
     <div className={styles.container}>
       <h1>File uploaded successfully</h1>
-      <button onClick={downloadResults}>
-        Download Results CSV
-      </button>
       <div className={styles.messageBox}>
         {/* Maps over changeLog and displays each log message */}
         {changeLog.map((log, index) => (
           <p key={index}>{log}</p>
         ))}
       </div>
+      <button onClick={downloadResults}>
+        Download Results CSV
+      </button>
     </div>
   );
 };
