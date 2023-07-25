@@ -6,20 +6,25 @@
     overflow: auto;
     text-align: center;
     min-height: 90vh;
-    /* currently scrolling, thanks to NavBar */
     background-color: burlywood;
     font-family: Arial, sans-serif;
     min-height: 86.5vh;
   }
   
   .conversionBox {
-    margin: auto;
     width: 40%;
-    padding: 2rem;
-    border: 1px solid black;
-    border-radius: 5px;
-    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
     background-color: rgb(49, 113, 170);
+    padding: 1em;
+    border-radius: 1em;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+    outline: black solid 1px;
   }
   
   .conversionBox input[type="number"] {
