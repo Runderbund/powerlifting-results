@@ -18,9 +18,8 @@ li {
 
 .navBar button {
   background: transparent;
-  border: 2px solid white;
   color: white;
-  padding: 0.4rem 0.5rem;
+  padding: 2px 4px;
   margin: 0;
   background: rgba(0, 0, 0, 0.8);
 }
@@ -35,6 +34,7 @@ li {
   cursor: pointer;
   font-size: 1.25rem;
   text-decoration: none;
+  
   color: white;
   background: rgba(0, 0, 0, 0.8);
   padding: 2px 4px;

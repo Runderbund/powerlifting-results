@@ -4,7 +4,7 @@
   overflow: auto;
   text-align: center;
   min-height: 91.5vh;
-  background-color: burlywood;
+  background: linear-gradient(to bottom, burlywood, #D35400);
   font-family: Arial, sans-serif;
 }
 

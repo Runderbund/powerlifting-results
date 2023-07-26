@@ -4,9 +4,10 @@
   text-align: center;
   min-height: 86.5vh;
   padding-top: 5vh;
-  background-color: burlywood;
+  background: linear-gradient(to bottom, burlywood, #D35400);
   font-family: Arial, sans-serif;
 }
+
 
 .logo {
   max-width: 800px;
