@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./UnitConversionPage.module.css";
+import '../../App.css';
 
 const UnitConversionPage = () => {
   const [conversionDirection, setConversionDirection] = useState("kg-lb");
@@ -28,7 +29,7 @@ const UnitConversionPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>Unit Conversion</h1>
       <div className={styles.conversionBox}>
         <div className={styles.switchContainer}>

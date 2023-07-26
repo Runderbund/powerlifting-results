@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import useCustomForm from "../../hooks/useCustomForm";
 import styles from "./RegisterPage.module.css";
-
+import '../../App.css';
 
 const RegisterPage = () => {
   const { registerUser } = useContext(AuthContext);
@@ -19,8 +19,8 @@ const RegisterPage = () => {
   );
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit}>
+    <div className="container">
+      <form className="contentBox" onSubmit={handleSubmit}>
         <label>
           Username:{" "}
           <input

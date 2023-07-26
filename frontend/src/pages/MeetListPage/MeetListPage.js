@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./MeetListPage.module.css";
+import '../../App.css';
+
 
 const MeetListPage = () => {
   const [meets, setMeets] = useState([]);
@@ -15,9 +17,9 @@ const MeetListPage = () => {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>Meets</h1>
-      <div className={styles.meetList}>
+      <div className="contentBox">
         {meets.map((meet) => (
           <div key={meet.meet_id}>
             <Link className={styles.meetLink} to={`/meet/${meet.meet_id}`}>{meet.meet_name}</Link>

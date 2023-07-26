@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./ResultsUploadPage.module.css";
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
+import '../../App.css';
 
 const ResultsUploadPage = () => {
   const [meetId, setMeetId] = useState(null);
@@ -46,7 +47,7 @@ const ResultsUploadPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>Upload Meet Results</h1>
       <form onSubmit={handleSubmit}>
         <label>

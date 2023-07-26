@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import styles from "./UploadSuccessPage.module.css";
+import '../../App.css';
 
 const UploadSuccessPage = () => {
   const location = useLocation();
@@ -11,7 +12,7 @@ const UploadSuccessPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>File uploaded successfully</h1>
       <div className={styles.messageBox}>
         {/* Maps over changeLog and displays each log message */}

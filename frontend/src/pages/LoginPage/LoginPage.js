@@ -3,6 +3,7 @@ import AuthContext from "../../context/AuthContext";
 import useCustomForm from "../../hooks/useCustomForm";
 import { Link } from "react-router-dom";
 import styles from "./LoginPage.module.css";
+import '../../App.css';
 
 
 const LoginPage = () => {
@@ -20,8 +21,8 @@ const LoginPage = () => {
   }, [isServerError, reset]);
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit}>
+    <div className="container">
+      <form className="contentBox" onSubmit={handleSubmit}>
         <label>
           Username:{" "}
           <input

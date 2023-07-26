@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import styles from "./LifterPage.module.css";
+import '../../App.css';
 
 const LifterPage = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const LifterPage = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>{lifterData.lifter[0].name}</h1>
       <table className={styles.result}>
         <thead>

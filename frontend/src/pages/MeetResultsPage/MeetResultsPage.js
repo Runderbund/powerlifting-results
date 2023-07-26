@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import styles from "./MeetResultsPage.module.css";
+import '../../App.css';
 
 const MeetResultsPage = () => {
   const { id } = useParams();
@@ -31,7 +32,7 @@ const MeetResultsPage = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1>
         {meetData.meet.meet_name} - {formatDate(meetData.meet.meet_date)}
       </h1>

@@ -1,6 +1,6 @@
 // General Imports
 import { Routes, Route } from "react-router-dom";
-import styles from "./App.module.css";
+import "./App.css";
 
 // Pages Imports
 import HomePage from "./pages/HomePage/HomePage";
@@ -25,7 +25,7 @@ function App() {
   return (
     <div>
       <Navbar />
-      <div className={styles.container}>
+      <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
