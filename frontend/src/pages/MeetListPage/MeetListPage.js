@@ -15,7 +15,7 @@ const MeetListPage = () => {
   }, []);
 
   return (
-    <div className={styles.meetContainer}>
+    <div className={styles.container}>
       <h1>Meets</h1>
       <div className={styles.meetList}>
         {meets.map((meet) => (

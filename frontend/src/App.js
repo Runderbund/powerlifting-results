@@ -23,9 +23,9 @@ import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   return (
-    <div className={styles.appContainer}>
+    <div>
       <Navbar />
-      <div className={styles.routesContainer}>
+      <div className={styles.container}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />

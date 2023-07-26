@@ -26,7 +26,7 @@ const LifterPage = () => {
   }
 
   return (
-    <div className={styles.lifterContainer}>
+    <div className={styles.container}>
       <h1>{lifterData.lifter[0].name}</h1>
       <table className={styles.result}>
         <thead>

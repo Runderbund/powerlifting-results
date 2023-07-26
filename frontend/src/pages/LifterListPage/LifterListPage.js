@@ -15,7 +15,7 @@ const LifterListPage = () => {
   }, []);
 
   return (
-    <div className={styles.lifterContainer}>
+    <div className={styles.container}>
       <h1>Lifters</h1>
       <div className={styles.lifterList}>
         {lifters.map((lifter) => (

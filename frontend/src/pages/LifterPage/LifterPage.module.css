@@ -1,13 +1,3 @@
-.lifterContainer {
-  align-items: flex-start;
-  margin: 0 auto;
-  overflow: auto;
-  text-align: center;
-  min-height: 91.5vh;
-  background: linear-gradient(to bottom, burlywood, #D35400);
-  font-family: Arial, sans-serif;
-}
-
 .result {
   width: 100%;
   margin-left: auto;
