@@ -10,10 +10,9 @@ li {
 }
 
 .navBar {
-  background: rgb(204, 116, 57);
+  background: url('../../assets/images/Banner.jpg') no-repeat center center/cover, rgb(204, 116, 57);
   box-shadow: 4px 2px 5px gray;
   color: white;
-  margin-bottom: 2rem;
   padding: 1.5rem 2rem;
 }
 
@@ -23,6 +22,7 @@ li {
   color: white;
   padding: 0.4rem 0.5rem;
   margin: 0;
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .navBar button:hover {
@@ -36,4 +36,7 @@ li {
   font-size: 1.25rem;
   text-decoration: none;
   color: white;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 2px 4px;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 }

@@ -16,6 +16,7 @@ import UploadSuccessPage from "./pages/UploadSuccessPage/UploadSuccessPage";
 
 // Component Imports
 import Navbar from "./components/NavBar/NavBar";
+import Footer from "./components/Footer/Footer";
 
 // Util Imports
 import PrivateRoute from "./utils/PrivateRoute";
@@ -44,6 +45,7 @@ function App() {
             }
           />
         </Routes>
+      <Footer />
       </div>
     </div>
   );

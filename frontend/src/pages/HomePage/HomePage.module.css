@@ -1,7 +1,3 @@
-/* Maybe a good idea to have global css along with modular. Set up basics, and then modify for each page.
-For now, just disconnecting from App.css and going all modular.
-Will lead to needless repetition, but clearer logic for me until the important stuff is done. */
-
 .container {
   margin: 0 auto;
   overflow: auto;
