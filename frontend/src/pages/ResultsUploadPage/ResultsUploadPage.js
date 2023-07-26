@@ -7,6 +7,7 @@ import { useDropzone } from "react-dropzone";
 const ResultsUploadPage = () => {
   const [meetId, setMeetId] = useState(null);
   const [acceptedFiles, setAcceptedFiles] = useState([]);
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -16,7 +17,7 @@ const ResultsUploadPage = () => {
     },
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event, emailAfterUpload = false) => {
     event.preventDefault();
 
     const formData = new FormData();
@@ -34,6 +35,9 @@ const ResultsUploadPage = () => {
         console.log("File uploaded successfully");
         setMeetId(response.data.meetId);
         navigate("/uploadsuccess", { state: { meetId: response.data.meetId, changeLog: response.data.changeLog } });
+        if (emailAfterUpload) {
+          window.location.href = `mailto:${email}?subject=Upload Successful&body=Your file has been uploaded successfully.`;
+        }
       })
       .catch((error) => {
         console.log("File upload failed");
@@ -63,7 +67,21 @@ const ResultsUploadPage = () => {
             <p>Drag and drop a results file here, or click to select file.</p>
           )}
         </div>
-        <button type="submit">Upload</button>
+        <label>
+          Meet Director Email:
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </label>
+        <div className={styles.buttonContainer}>
+          <button type="submit">Upload</button>
+          <button 
+            type="submit" 
+            onClick={(e) => handleSubmit(e, true)} 
+            disabled={!email}
+            title={!email ? "Fill in Meet Director Email to enable." : ""}
+          >
+            Upload and Email
+          </button>
+        </div>
       </form>
     </div>
   );

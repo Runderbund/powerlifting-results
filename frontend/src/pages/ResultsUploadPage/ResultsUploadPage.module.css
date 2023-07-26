@@ -84,3 +84,17 @@ button:hover {
   cursor: pointer;
   width: 90%;
 }
+
+.buttonContainer {
+  display: flex;
+  gap: 1em;
+}
+
+button[disabled] {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+button[disabled]:hover {
+  background-color: gray;
+}
