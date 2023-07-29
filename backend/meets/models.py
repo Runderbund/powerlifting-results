@@ -1,7 +1,6 @@
 from django.db import models
 
-# Limit input choices to only valid options. Display full name of choice instead of abbreviation.
-# Want to eventually limit to drop-downs on Entry form, but out of scope for now.
+# Limit input choices to only valid options.
 DIVISION_CHOICES = (
     ('MR-SJ', 'Male Raw - Sub Junior'),
     ('MR-JR', 'Male Raw - Junior'),
@@ -66,31 +65,17 @@ class Meet(models.Model):
     meet_id = models.AutoField(primary_key=True)
     meet_name = models.CharField(max_length=255)
     meet_date = models.DateField()
-    # Name and date come from textboxes outside of CSV (for now).
-    # Eventually State/Location and Sanction #, not important for now.
 
-# Not currently used
-class Record(models.Model):
-    division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
-    discipline = models.CharField(max_length=2, choices=DISCIPLINE_CHOICES, null=True)
-    weight_class_kg = models.IntegerField()
-    meet = models.ForeignKey(Meet, on_delete=models.PROTECT, null=True)
-    lifter = models.ForeignKey(Lifter, on_delete=models.PROTECT, null=True)
-    lift_weight_kg = models.FloatField()
-    date = models.DateField()
 
-# Added null=True to all fields to avoid errors. Adjust later once I figure out main areas.
 class Result(models.Model):
     result_id = models.AutoField(primary_key=True)
     meet = models.ForeignKey(Meet, on_delete=models.CASCADE, null=True)
     lifter = models.ForeignKey(Lifter, on_delete=models.CASCADE, null=True)
-        # instead of name and member_id. Linked to lifter, which includes both
-        # Not sure how to handle listing results for individual lifter efficiently. Current plan involves matching across all results for member_id, but this involves checking the whole thing every time a lifter page loads.
-    team = models.CharField(max_length=255, null=True)
+    team = models.CharField(max_length=30, null=True)
     division = models.CharField(max_length=5, choices=DIVISION_CHOICES, null=True)
-    sex = models.CharField(max_length=100, choices=SEX_CHOICES, null=True)
-    equipment = models.CharField(max_length=100, choices=EQUIPMENT_CHOICES, null=True)
-    age_group = models.CharField(max_length=200, null=True)
+    sex = models.CharField(max_length=1, choices=SEX_CHOICES, null=True)
+    equipment = models.CharField(max_length=1, choices=EQUIPMENT_CHOICES, null=True)
+    age_group = models.CharField(max_length=2, null=True)
     bodyweight = models.FloatField(null=True)
     weight_class = models.CharField(max_length=5, null=True)
     date_of_birth = models.DateField(null=True)
@@ -109,4 +94,4 @@ class Result(models.Model):
     points = models.FloatField(null=True)
     state = models.CharField(max_length=2, null=True)
     placing = models.IntegerField(null=True)
-    drug_tested = models.CharField(max_length=1, null=True) # Could add Y/N as choices
+    drug_tested = models.CharField(max_length=1, null=True)
