@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./LifterListPage.module.css";
-import '../../App.css';
+import "../../App.css";
 
 /**
- * LifterListPage Component
  * This component is responsible for displaying a list of lifters.
- * @component
  */
 const LifterListPage = () => {
   /**
@@ -33,7 +31,7 @@ const LifterListPage = () => {
 
   /**
    * Renders the component.
-   * It maps through the lifters array and creates a Link component for each lifter.
+   * Maps through the lifters array and creates a Link component for each lifter.
    * Each Link navigates to the lifter's individual page when clicked.
    */
   return (
@@ -42,7 +40,12 @@ const LifterListPage = () => {
       <div className="contentBox">
         {lifters.map((lifter) => (
           <div key={lifter.member_id}>
-            <Link className={styles.lifterLink} to={`/lifter/${lifter.member_id}`}>{lifter.name}</Link>
+            <Link
+              className={styles.lifterLink}
+              to={`/lifter/${lifter.member_id}`}
+            >
+              {lifter.name}
+            </Link>
           </div>
         ))}
       </div>

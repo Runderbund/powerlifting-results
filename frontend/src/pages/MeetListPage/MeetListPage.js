@@ -4,10 +4,14 @@ import { Link } from "react-router-dom";
 import styles from "./MeetListPage.module.css";
 import '../../App.css';
 
-
+/**
+ * MeetListPage component fetches and displays a list of meets.
+ * @component
+ */
 const MeetListPage = () => {
   const [meets, setMeets] = useState([]);
 
+  // Fetches meets data when the component mounts.
   useEffect(() => {
     const fetchMeets = async () => {
       const response = await axios.get("http://localhost:8000/meets/meets/");
@@ -16,6 +20,7 @@ const MeetListPage = () => {
     fetchMeets();
   }, []);
 
+  // Renders a list of meets, each meet links to its individual meet page.
   return (
     <div className="container">
       <h1>Meets</h1>
