@@ -27,7 +27,7 @@ const UploadSuccessPage = () => {
    */
   return (
     <div className="container">
-      <h1>File uploaded successfully</h1>
+      <h1>File Uploaded Successfully</h1>
       <div className={styles.messageBox}>
         {changeLog.map((log, index) => (
           <p key={index}>{log}</p>
