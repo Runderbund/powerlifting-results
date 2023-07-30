@@ -20,7 +20,7 @@ const MeetResultsPage = () => {
   useEffect(() => {
     const fetchMeetData = async () => {
       const response = await axios.get(
-        `http://localhost:8000/meets/${id}/results/`
+        `http://localhost:8000/${id}/results/`
       );
       setMeetData(response.data);
     };

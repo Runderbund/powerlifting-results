@@ -23,7 +23,7 @@ const LifterListPage = () => {
      * @async
      */
     const fetchLifters = async () => {
-      const response = await axios.get("http://localhost:8000/meets/lifters/");
+      const response = await axios.get("http://localhost:8000/lifters/");
       setLifters(response.data.lifters);
     };
     fetchLifters();

@@ -14,7 +14,7 @@ const MeetListPage = () => {
   // Fetches meets data when the component mounts.
   useEffect(() => {
     const fetchMeets = async () => {
-      const response = await axios.get("http://localhost:8000/meets/meets/");
+      const response = await axios.get("http://localhost:8000/meets/");
       setMeets(response.data.meets);
     };
     fetchMeets();

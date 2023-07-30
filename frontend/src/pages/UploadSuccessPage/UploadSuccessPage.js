@@ -19,7 +19,7 @@ const UploadSuccessPage = () => {
    * Function to trigger the download of the results.
    */
   const downloadResults = () => {
-    window.location.href = `http://localhost:8000/meets/${meetId}/results/download/`;
+    window.location.href = `http://localhost:8000/${meetId}/results/download/`;
   };
 
   /**

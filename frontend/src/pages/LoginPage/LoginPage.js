@@ -10,6 +10,10 @@ import { Link } from "react-router-dom";
 import styles from "./LoginPage.module.css";
 import '../../App.css';
 
+/**
+ * LoginPage component is responsible for rendering the login form.
+ * @component
+ */
 const LoginPage = () => {
   // Gets the loginUser function and isServerError flag from  AuthContext
   const { loginUser, isServerError } = useContext(AuthContext);

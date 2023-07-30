@@ -27,7 +27,7 @@ const ResultsUploadPage = () => {
     formData.append("resultsFile", acceptedFiles[0]);
 
     axios
-      .post("http://localhost:8000/meets/upload/", formData, {
+      .post("http://localhost:8000/upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

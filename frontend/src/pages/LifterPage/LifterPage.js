@@ -19,7 +19,7 @@ const LifterPage = () => {
   useEffect(() => {
     const fetchLifterData = async () => {
       const response = await axios.get(
-        `http://localhost:8000/meets/lifters/${id}/`
+        `http://localhost:8000/lifters/${id}/`
       );
       setLifterData(response.data);
     };
