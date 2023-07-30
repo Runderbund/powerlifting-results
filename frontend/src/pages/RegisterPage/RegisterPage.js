@@ -2,10 +2,16 @@ import React, { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import useCustomForm from "../../hooks/useCustomForm";
 import styles from "./RegisterPage.module.css";
-import '../../App.css';
+import "../../App.css";
 
+/**
+ * RegisterPage is responsible for rendering a registration form and handling user registration.
+ * @component
+ */
 const RegisterPage = () => {
   const { registerUser } = useContext(AuthContext);
+
+  // Default (blank) form values
   const defaultValues = {
     username: "",
     email: "",
@@ -13,16 +19,19 @@ const RegisterPage = () => {
     firstName: "",
     lastName: "",
   };
+
+  // Custom form hook that provides form data, change handler, and submit handler
   const [formData, handleInputChange, handleSubmit] = useCustomForm(
     defaultValues,
     registerUser
   );
 
+  // Renders a registration form
   return (
     <div className="container">
       <form className="contentBox" onSubmit={handleSubmit}>
         <label>
-          Username:{" "}
+          Username:
           <input
             type="text"
             name="username"
@@ -31,7 +40,7 @@ const RegisterPage = () => {
           />
         </label>
         <label>
-          First Name:{" "}
+          First Name:
           <input
             type="text"
             name="firstName"
@@ -40,7 +49,7 @@ const RegisterPage = () => {
           />
         </label>
         <label>
-          Last Name:{" "}
+          Last Name:
           <input
             type="text"
             name="lastName"
@@ -49,7 +58,7 @@ const RegisterPage = () => {
           />
         </label>
         <label>
-          Email:{" "}
+          Email:
           <input
             type="text"
             name="email"
@@ -58,7 +67,7 @@ const RegisterPage = () => {
           />
         </label>
         <label>
-          Password:{" "}
+          Password:
           <input
             type="text"
             name="password"

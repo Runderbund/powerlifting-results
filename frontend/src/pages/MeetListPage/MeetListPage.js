@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./MeetListPage.module.css";
-import '../../App.css';
+import "../../App.css";
 
 /**
- * MeetListPage component fetches and displays a list of meets.
+ * MeetListPage fetches and displays a list of meets.
  * @component
  */
 const MeetListPage = () => {
@@ -27,7 +27,9 @@ const MeetListPage = () => {
       <div className="contentBox">
         {meets.map((meet) => (
           <div key={meet.meet_id}>
-            <Link className={styles.meetLink} to={`/meet/${meet.meet_id}`}>{meet.meet_name}</Link>
+            <Link className={styles.meetLink} to={`/meet/${meet.meet_id}`}>
+              {meet.meet_name}
+            </Link>
           </div>
         ))}
       </div>

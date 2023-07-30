@@ -1,15 +1,14 @@
 import { useLocation } from "react-router-dom";
 import styles from "./UploadSuccessPage.module.css";
-import '../../App.css';
+import "../../App.css";
 
 /**
- * UploadSuccessPage Component
- * This component is responsible for displaying the upload status.
+ * UploadSuccessPage is responsible for displaying the upload status.
  * @component
  */
 const UploadSuccessPage = () => {
   /**
-   * Using the useLocation hook to access the state passed through the router.
+   * Uses the useLocation hook to access the state passed from ResultsUploadPage.
    */
   const location = useLocation();
   const meetId = location.state.meetId;
@@ -23,7 +22,7 @@ const UploadSuccessPage = () => {
   };
 
   /**
-   * Rendering the component.
+   * Renders the component.
    * It maps through the changeLog array and creates a paragraph for each log message.
    */
   return (
@@ -34,9 +33,7 @@ const UploadSuccessPage = () => {
           <p key={index}>{log}</p>
         ))}
       </div>
-      <button onClick={downloadResults}>
-        Download Results CSV
-      </button>
+      <button onClick={downloadResults}>Download Results CSV</button>
     </div>
   );
 };

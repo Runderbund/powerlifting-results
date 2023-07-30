@@ -21,17 +21,16 @@
   background-color: rgb(90, 129, 163);
 }
 
-
 .result table {
   table-layout: fixed;
   width: 100%;
 }
 
-.result th
-{
+.result th {
   background-color: rgb(49, 113, 170);
 }
-.result th, .result td {
+.result th,
+.result td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

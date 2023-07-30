@@ -5,7 +5,7 @@ import styles from "./LifterPage.module.css";
 import "../../App.css";
 
 /**
- * This component is responsible for displaying detailed information about a specific lifter.
+ * LifterPage is responsible for displaying detailed information about a specific lifter.
  * @component
  */
 const LifterPage = () => {
@@ -18,9 +18,7 @@ const LifterPage = () => {
   // `useEffect` is used to fetch the data about the lifter when the component first mounts or when `id` changes.
   useEffect(() => {
     const fetchLifterData = async () => {
-      const response = await axios.get(
-        `http://localhost:8000/lifters/${id}/`
-      );
+      const response = await axios.get(`http://localhost:8000/lifters/${id}/`);
       setLifterData(response.data);
     };
     fetchLifterData();

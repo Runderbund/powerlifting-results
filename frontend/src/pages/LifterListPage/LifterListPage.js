@@ -5,7 +5,7 @@ import styles from "./LifterListPage.module.css";
 import "../../App.css";
 
 /**
- * This component is responsible for displaying a list of lifters.
+ * LifterListPage is responsible for displaying a list of lifters.
  */
 const LifterListPage = () => {
   /**

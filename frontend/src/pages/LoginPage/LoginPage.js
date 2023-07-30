@@ -8,10 +8,10 @@ import useCustomForm from "../../hooks/useCustomForm";
 // Router and styles imports
 import { Link } from "react-router-dom";
 import styles from "./LoginPage.module.css";
-import '../../App.css';
+import "../../App.css";
 
 /**
- * LoginPage component is responsible for rendering the login form.
+ * LoginPage is responsible for rendering the login form.
  * @component
  */
 const LoginPage = () => {

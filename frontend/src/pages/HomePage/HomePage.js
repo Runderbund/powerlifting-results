@@ -4,7 +4,7 @@ import logo from "../../assets/images/BearLogo.jpg";
 import "../../App.css";
 
 /**
- * This component is responsible for displaying the home page.
+ * HomePage is responsible for displaying the home page.
  * @component
  */
 const HomePage = () => {
