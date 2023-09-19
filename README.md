@@ -1,5 +1,5 @@
 ## Users
-Users are able to view meet results and  inidividual lifter results, and also use the unit converter from lb to kg. 
+Users are able to view meet results and individual lifter results, and also use the unit converter from pounds to kilograms. 
 
 ## Admin
 Admin users are able to upload CSV files. The system will automatically check the validity of the results (such as making sure the lifter's age matches their age group) and fix errors.
