@@ -242,7 +242,7 @@ def calculate_total(
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
 # TODO: Finish adjusting for sub-juniors
-## Adjust to SJ if accidentally in J, vice/versa
+## Adjust to SJ if accidentally in J
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
     age_div = division_components["age_group"]
@@ -265,14 +265,10 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
         
         if sj_start_date <= meet_date <= sj_end_date:
             return division, []
-        else:
-            # Reclassification logic
-            age_changes = [name, age_div, "O"]
-            division = division.replace(age_div, "O")
-            return division, age_changes
-
+        
     # Define the age groups with the minimum and maximum age for each
     age_groups = {
+        "SJ": {"min": 14, "max": 18},
         "J": {"min": 19, "max": 23},
         "M1": {"min": 40, "max": 49},
         "M2": {"min": 50, "max": 59},
@@ -280,12 +276,12 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
         "M4": {"min": 70, "max": float('inf')},  # No upper limit for M4
     }
 
-    correct_age_div = "O" # Default to Open division
+    correct_age_div = "O"  # Default to Open division
 
     # Finds the correct age division based on DOB
     for age_group, age_range in age_groups.items():
         # Checks if the lifter's age is within the current age group's range
-        if age_range["min"] <= age_at_meet < age_range["max"]:
+        if age_range["min"] <= age_at_meet <= age_range["max"]:
             # Sets the correct age division to the current age group
             correct_age_div = age_group
             break
@@ -297,7 +293,6 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
     else:
         age_changes = []
     return division, age_changes
-
 
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
