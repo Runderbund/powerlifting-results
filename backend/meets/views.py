@@ -242,7 +242,7 @@ def calculate_total(
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
 # This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
 # TODO: Finish adjusting for sub-juniors
-## Adjust to SJ if accidentally in J
+## Adjust to SJ if accidentally in J, vice/versa
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
     age_div = division_components["age_group"]
@@ -258,10 +258,10 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
     age_at_meet = age_delta.days // 365  # Integer division to get the age in full years
 
     # Special case for Sub-Junior (SJ) classification
-    # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years.""
+    # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years."
     if age_div == "SJ":
         sj_start_date = date(date_of_birth.year + 14, date_of_birth.month, date_of_birth.day)
-        sj_end_date = date(date_of_birth.year + 18, date_of_birth.month, date_of_birth.day)
+        sj_end_date = date(date_of_birth.year + 18, 12, 31)
         
         if sj_start_date <= meet_date <= sj_end_date:
             return division, []
@@ -284,7 +284,7 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
 
     # Finds the correct age division based on DOB
     for age_group, age_range in age_groups.items():
-        # If the lifter's age is within the current age group's range
+        # Checks if the lifter's age is within the current age group's range
         if age_range["min"] <= age_at_meet < age_range["max"]:
             # Sets the correct age division to the current age group
             correct_age_div = age_group
