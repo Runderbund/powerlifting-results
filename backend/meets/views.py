@@ -240,9 +240,6 @@ def calculate_total(
 
 
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
-# This is by year. E.g., in 2023, anyone born in 2000 is considered a 23 years old.
-# TODO: Finish adjusting for sub-juniors
-## Adjust to SJ if accidentally in J
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
     age_div = division_components["age_group"]
@@ -257,15 +254,6 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
     age_delta = meet_date - date_of_birth
     age_at_meet = age_delta.days // 365  # Integer division to get the age in full years
 
-    # Special case for Sub-Junior (SJ) classification
-    # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years."
-    if age_div == "SJ":
-        sj_start_date = date(date_of_birth.year + 14, date_of_birth.month, date_of_birth.day)
-        sj_end_date = date(date_of_birth.year + 18, 12, 31)
-        
-        if sj_start_date <= meet_date <= sj_end_date:
-            return division, []
-        
     # Define the age groups with the minimum and maximum age for each
     age_groups = {
         "SJ": {"min": 14, "max": 18},
@@ -286,6 +274,14 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
             correct_age_div = age_group
             break
 
+    # Special case for Sub-Junior (SJ) classification
+    # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years."
+    if age_groups["SJ"]["min"] <= age_at_meet <= age_groups["SJ"]["max"]:
+        sj_start_date = date(date_of_birth.year + 14, date_of_birth.month, date_of_birth.day)
+        sj_end_date = date(date_of_birth.year + 18, 12, 31)
+        if sj_start_date <= meet_date <= sj_end_date:
+            correct_age_div = "SJ"
+            
     # If the lifter's division doesn't match the correct age division, returns the corrected division
     if age_div != correct_age_div:
         age_changes = [name, age_div, correct_age_div]
@@ -293,7 +289,6 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
     else:
         age_changes = []
     return division, age_changes
-
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
 def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
