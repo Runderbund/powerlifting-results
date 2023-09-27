@@ -240,54 +240,62 @@ def calculate_total(
 
 
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
+from datetime import date
+
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
     age_div = division_components["age_group"]
 
-    # If the lifter's division is "O", no check is needed: returns the original division and an empty change list. 
-    if age_div == "O":
-        return division, []
-
     age_changes = []
-
+    
     # Calculates the lifter's age
     age_delta = meet_date - date_of_birth
-    age_at_meet = age_delta.days // 365  # Integer division to get the age in full years
 
-    # Define the age groups with the minimum and maximum age for each
-    age_groups = {
-        "SJ": {"min": 14, "max": 18},
-        "J": {"min": 19, "max": 23},
-        "M1": {"min": 40, "max": 49},
-        "M2": {"min": 50, "max": 59},
-        "M3": {"min": 60, "max": 69},
-        "M4": {"min": 70, "max": float('inf')},  # No upper limit for M4
-    }
+    # If the lifter is younger than 14, calculate age down to the exact day.
+    if age_delta.days < 14 * 365:
+        # Need to account for leap years
+        age_at_meet = age_delta.days / 365.0  # Floating-point division to get the precise age
+        correct_age_div = "Y"  # Youth division
+        # Need to check age ranges/rules for youth division.
+    else:
+        age_at_meet = age_delta.days // 365  # Integer division to get the age in full years
 
-    correct_age_div = "O"  # Default to Open division
+        # Define the age groups with the minimum and maximum age for each
+        age_groups = {
+            "SJ": {"min": 14, "max": 18},
+            "J": {"min": 19, "max": 23},
+            "M1": {"min": 40, "max": 49},
+            "M2": {"min": 50, "max": 59},
+            "M3": {"min": 60, "max": 69},
+            "M4": {"min": 70, "max": float('inf')},  # No upper limit for M4
+            # M5 for records. Not IPF, but smaller divisions
+        }
 
-    # Finds the correct age division based on DOB
-    for age_group, age_range in age_groups.items():
-        # Checks if the lifter's age is within the current age group's range
-        if age_range["min"] <= age_at_meet <= age_range["max"]:
-            # Sets the correct age division to the current age group
-            correct_age_div = age_group
-            break
+        correct_age_div = "O"  # Default to Open division
 
-    # Special case for Sub-Junior (SJ) classification
-    # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years."
-    if age_groups["SJ"]["min"] <= age_at_meet <= age_groups["SJ"]["max"]:
-        sj_start_date = date(date_of_birth.year + 14, date_of_birth.month, date_of_birth.day)
-        sj_end_date = date(date_of_birth.year + 18, 12, 31)
-        if sj_start_date <= meet_date <= sj_end_date:
-            correct_age_div = "SJ"
-            
+        # Finds the correct age division based on DOB
+        for age_group, age_range in age_groups.items():
+            # Checks if the lifter's age is within the current age group's range
+            if age_range["min"] <= age_at_meet <= age_range["max"]:
+                # Sets the correct age division to the current age group
+                correct_age_div = age_group
+                break
+
+        # Special case for Sub-Junior (SJ) classification
+        # "Sub-Junior: from the day the lifter reaches 14 years and throughout the full calendar year in which the lifter reaches 18 years."
+        if age_groups["SJ"]["min"] <= age_at_meet <= age_groups["SJ"]["max"]:
+            sj_start_date = date(date_of_birth.year + 14, date_of_birth.month, date_of_birth.day)
+            sj_end_date = date(date_of_birth.year + 18, 12, 31)
+            if sj_start_date <= meet_date <= sj_end_date:
+                correct_age_div = "SJ"
+
     # If the lifter's division doesn't match the correct age division, returns the corrected division
     if age_div != correct_age_div:
         age_changes = [name, age_div, correct_age_div]
         division = division.replace(age_div, correct_age_div)
     else:
         age_changes = []
+        
     return division, age_changes
 
 # Check whether the lifter is in the correct weight class for their bodyweight.
