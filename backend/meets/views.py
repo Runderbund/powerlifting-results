@@ -262,6 +262,8 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
 
         # Define the age groups with the minimum and maximum age for each
         age_groups = {
+            "Y": {"min": 8, "max": 11},
+            "PSJ": {"min": 12, "max": 12},
             "SJ": {"min": 14, "max": 18},
             "J": {"min": 19, "max": 23},
             "M1": {"min": 40, "max": 49},
