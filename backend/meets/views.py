@@ -262,8 +262,8 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
 
         # Define the age groups with the minimum and maximum age for each
         age_groups = {
-            "Y": {"min": 8, "max": 11},
-            "PSJ": {"min": 12, "max": 12},
+            "Y": {"min": 8, "max": 11}, # Youth. Needs different logic entirely, no weight classes. Also Raw only.
+            "PSJ": {"min": 12, "max": 12}, # Pre-Sub-Junior
             "SJ": {"min": 14, "max": 18},
             "J": {"min": 19, "max": 23},
             "M1": {"min": 40, "max": 49},
@@ -304,7 +304,7 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
 def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
     WEIGHT_CLASSES = {
         "female": {
-            "43": {"min": 0, "max": 43},
+            "43": {"min": 0, "max": 43}, #J/SJ Only
             "47": {"min": 43.1, "max": 47},
             "52": {"min": 47.1, "max": 52},
             "57": {"min": 52.1, "max": 57},
@@ -315,7 +315,7 @@ def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
             "84+": {"min": 84.1, "max": float("inf")},
         },
         "male": {
-            "53": {"min": 0, "max": 53},
+            "53": {"min": 0, "max": 53}, #J/SJ Only
             "59": {"min": 53.1, "max": 59},
             "66": {"min": 59.1, "max": 66},
             "74": {"min": 66.1, "max": 74},
