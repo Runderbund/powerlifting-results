@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./HomePage.module.css";
-import logo from "../../assets/images/BearLogo.jpg";
+import logo from "../../assets/images/BearLogo.jpeg";
 import "../../App.css";
 
 /**
