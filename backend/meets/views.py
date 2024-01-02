@@ -29,7 +29,7 @@ def upload_file(request):
         )
     else:
         form = UploadFileForm()
-    return render(request, "upload.html", {"form": form})
+    return render(request, "upload.html", {"form": form}) # Don't think I actually made an upload.html file. Probably only avoiding problems because this never gets called.
 
 
 # Runs through each lifter in the CSV file and resolves conflicts.
@@ -240,7 +240,6 @@ def calculate_total(
 
 
 # Check whether the lifter is in the correct division for their age. If not, they will be moved to the correct division prior to calculating placing and points.
-from datetime import date
 
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
