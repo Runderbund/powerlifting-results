@@ -66,6 +66,7 @@ def handle_uploaded_file(f, meet):
             meet,
         ) = row.values()
 
+        # Review whether I calculated total as 0 if any discipline has no valid lifts. Needs to check against division, e.g. bench only. 
         total = calculate_total(
             squat1,
             squat2,
@@ -92,6 +93,7 @@ def handle_uploaded_file(f, meet):
         )
         points = calculate_points(sex, equipment, discipline, total, bodyweight)
 
+        # If an age change was made, age_change will be a list with 3 elements. If not, it will be an empty list. Same with weight_change
         if len(age_change) == 3:
             age_div_changes.append(age_change)
         if len(weight_change) == 3:
@@ -244,6 +246,9 @@ def calculate_total(
 def compare_dob_and_division(name, date_of_birth, division, meet_date):
     division_components = deconstruct_division(division)
     age_div = division_components["age_group"]
+    # Could consolidate to:
+        # age_div = deconstruct_division(division)["age_group"]
+        # Shorter, but any clearer?
 
     age_changes = []
     
@@ -262,7 +267,7 @@ def compare_dob_and_division(name, date_of_birth, division, meet_date):
         # Define the age groups with the minimum and maximum age for each
         age_groups = {
             "Y": {"min": 8, "max": 11}, # Youth. Needs different logic entirely, no weight classes. Also Raw only.
-            "PSJ": {"min": 12, "max": 12}, # Pre-Sub-Junior
+            "PSJ": {"min": 12, "max": 12}, # Pre-Sub-Junior. Should this be 12-13? Or 12 only?
             "SJ": {"min": 14, "max": 18},
             "J": {"min": 19, "max": 23},
             "M1": {"min": 40, "max": 49},
@@ -334,6 +339,7 @@ def compare_bodyweight_and_weightclass(name, sex, weight_class, bodyweight):
         # If the lifter's bodyweight is within the current weight class's range
         if weight_range["min"] <= bodyweight <= weight_range["max"]:
             # Sets the correct weight class to the current weight class
+            # Should check age, or could have open competitor assigned to J/SJ weight class
             correct_weight_class = weight_class_key
             break
 
