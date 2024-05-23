@@ -12,7 +12,7 @@ import "../../App.css";
 const ResultsUploadPage = () => {
   // State variables for storing the meet ID, accepted CSV file, and email address
   const [meetId, setMeetId] = useState(null);
-  const [acceptedFiles, setAcceptedFiles] = useState([]);
+  const [acceptedFiles, setAcceptedFiles] = useState([]); // Do I need an array? I'm just using one file.
   const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
